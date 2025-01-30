@@ -6,7 +6,7 @@
 /*   By: sodahani <sodahani@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:34:41 by sodahani          #+#    #+#             */
-/*   Updated: 2025/01/30 16:26:12 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/01/30 17:48:24 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,8 +80,16 @@ int	check_min_max(char **res)
 	while (res[i])
 	{
 		tmp = ft_atoi(res[i]);
-		if (tmp > INT_MAX || tmp <= 0)
-			return (0);
+		if (i != 4)
+		{
+			if (tmp > INT_MAX || tmp <= 0)
+				return (0);
+		}
+		else
+		{
+			if (tmp > INT_MAX || tmp <= -1)
+				return (0);
+		}
 		i++;
 	}
 	return (1);

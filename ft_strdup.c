@@ -6,7 +6,7 @@
 /*   By: sodahani <sodahani@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/23 10:49:49 by sodahani          #+#    #+#             */
-/*   Updated: 2025/01/30 16:21:25 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/01/30 17:49:13 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,12 +67,6 @@ int	*convert_to_integers(char **res, int *capacity)
 	while (i < *capacity)
 	{
 		tmp = ft_atoi(res[i]);
-		if (tmp > INT_MAX || tmp <= 0)
-		{
-			free_string_array(res);
-			free(num);
-			return (NULL);
-		}
 		num[i] = (int)tmp;
 		free(res[i]);
 		i++;
