@@ -1,4 +1,4 @@
-SRCS = 
+SRCS = ft_split.c ft_strdup.c ft_strjoin.c philo.c helper_function.c 
 SRCSB =
 
 OBJS = ${SRCS:.c=.o}
