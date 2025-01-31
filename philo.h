@@ -6,7 +6,7 @@
 /*   By: sodahani <sodahani@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:35:01 by sodahani          #+#    #+#             */
-/*   Updated: 2025/01/30 15:58:50 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/01/31 12:17:42 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,35 @@
 # define PHILO_H
 
 # include <limits.h>
-# include <pthread.h>
+#include <pthread.h>
+#include <sys/time.h>
 # include <stdio.h>
 # include <stdlib.h>
 # include <unistd.h>
+
+typedef struct s_philo
+{
+    int             id;
+    int             meals_eaten;
+    long long       last_meal_time;
+    pthread_t       thread;
+    struct s_data   *data;
+}   t_philo;
+
+typedef struct s_data
+{
+    int             num_philos;
+    int             time_to_die;
+    int             time_to_eat;
+    int             time_to_sleep;
+    int             must_eat_count;
+    int             dead;
+    struct timeval start_time;
+    pthread_mutex_t *forks;
+    pthread_mutex_t print_mutex;
+    pthread_mutex_t death_mutex;
+    t_philo         *philos;
+}   t_data;
 
 int		ft_isdigit(int c);
 char	**ft_split(char const *s, char c);
