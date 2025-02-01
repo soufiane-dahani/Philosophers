@@ -6,7 +6,7 @@
 /*   By: sodahani <sodahani@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:35:01 by sodahani          #+#    #+#             */
-/*   Updated: 2025/01/31 12:17:42 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/01 17:45:02 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,5 +58,12 @@ int		*convert_to_integers(char **res, int *capacity);
 long	ft_atoi(const char *str);
 void	free_string_array(char **arr);
 int		check_min_max(char **res);
+t_data *initialize_data(int num_philos, int time_to_die, int time_to_eat, int time_to_sleep);
+void eat(t_philo *philo);
+void think(t_philo *philo);
+void philo_sleep(t_philo *philo);
+long get_current_time(void);
+void *philosopher_routine(void *arg);
+void take_forks(t_philo *philo);
 
 #endif

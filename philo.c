@@ -6,54 +6,98 @@
 /*   By: sodahani <sodahani@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:34:41 by sodahani          #+#    #+#             */
-/*   Updated: 2025/01/31 12:20:44 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/01 17:48:24 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
  
-t_data *initialize_data(int num_philos, int time_to_die, int time_to_eat, int time_to_sleep)
+void define_the_thread(t_data *data)
 {
-	t_data	*data;
-    int		i;
-
-	i = 0;
-	data = malloc(sizeof(t_data));
-	if (!data)
-		return (NULL);
-	data->num_philos = num_philos;
-    data->time_to_die = time_to_die;
-    data->time_to_eat = time_to_eat;
-    data->time_to_sleep = time_to_sleep;
-    data->dead = 0;
-	data->philos = malloc(sizeof(t_philo) * num_philos);
-    if (!data->philos)
-	{
-        free(data);
-        return (NULL);
+    int i;
+    i = 0;
+    while (i < data->num_philos)
+    {
+        pthread_create(&data->philos[i].thread, NULL, philosopher_routine, &data->philos[i]);
+        i++;
     }
-	data->forks = malloc(sizeof(pthread_mutex_t) * num_philos);
-	if (!data->forks)
-		return (free(data->philos), free(data), NULL);
-	while (i < num_philos)
-	{
-		pthread_mutex_init(&data->forks[i], NULL);
-		i++;
-	}
-	pthread_mutex_init(&data->print_mutex, NULL);
-    pthread_mutex_init(&data->death_mutex, NULL);
-	i = 0;
-	while (i < num_philos)
-	{
-		data->philos[i].id = i + 1;
-        data->philos[i].meals_eaten = 0;
-        data->philos[i].last_meal_time = 0;
-        data->philos[i].data = data;
-		i++;
-	}
-	gettimeofday(&data->start_time, NULL);
-	return(data);
 }
+long get_current_time(void)
+{
+    struct timeval tv;
+
+    gettimeofday(&tv, NULL);
+    return (tv.tv_sec * 1000) + (tv.tv_usec / 1000);
+}
+void philo_sleep(t_philo *philo)
+{
+    long start_time = get_current_time();
+    while (get_current_time() - start_time < philo->data->time_to_sleep)
+        usleep(100);
+}
+void think(t_philo *philo)
+{
+    printf("philo %d is thinking\n", philo->id);
+    usleep(500);
+}
+
+void take_forks(t_philo *philo)
+{
+    int left_fork = (philo->id - 1) % philo->data->num_philos;
+    int right_fork = philo->id % philo->data->num_philos;
+
+    int first_fork = (left_fork < right_fork) ? left_fork : right_fork;
+    int second_fork = (left_fork < right_fork) ? right_fork : left_fork;
+
+    pthread_mutex_lock(&philo->data->forks[first_fork]);
+    pthread_mutex_lock(&philo->data->forks[second_fork]);
+}
+void eat(t_philo *philo)
+{
+    printf("Philo %d is eating\n", philo->id);
+    
+    long start_time = get_current_time();
+    while (get_current_time() - start_time < philo->data->time_to_eat)
+    {
+        usleep(100);
+    }
+    printf("Philo %d has finished eating\n", philo->id);
+	philo->meals_eaten++;
+}
+
+
+void release_forks(t_philo *philo)
+{
+    int left_fork = (philo->id - 1) % philo->data->num_philos;
+    int right_fork = philo->id % philo->data->num_philos;
+
+    // Add resource hierarchy to prevent deadlock
+    int first_fork = (left_fork < right_fork) ? left_fork : right_fork;
+    int second_fork = (left_fork < right_fork) ? right_fork : left_fork;
+
+    pthread_mutex_unlock(&philo->data->forks[first_fork]);
+
+    pthread_mutex_unlock(&philo->data->forks[second_fork]);
+}
+
+
+void *philosopher_routine(void *arg)
+{
+    t_philo *philo = (t_philo *)arg;
+    
+
+    while (!philo->data->dead)
+    {
+        think(philo);
+        take_forks(philo);
+        eat(philo);
+        release_forks(philo);
+        philo_sleep(philo);
+    }
+    return NULL;
+}
+
+
 
 int	main(int ac, char const **av)
 {
@@ -90,5 +134,6 @@ int	main(int ac, char const **av)
 		write(2, "Memory allocation error\n", 24);
 		return(1);
 	}
+	define_the_thread(data);
 	free(num);
 }
