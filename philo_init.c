@@ -6,7 +6,7 @@
 /*   By: sodahani <sodahani@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:34:41 by sodahani          #+#    #+#             */
-/*   Updated: 2025/01/31 19:01:38 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/02 12:41:14 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,12 +26,13 @@ static void	init_mutexes_and_philos(t_data *data)
 	{
 		data->philos[i].id = i + 1;
 		data->philos[i].meals_eaten = 0;
-		data->philos[i].last_meal_time = 0;
+		data->philos[i].last_meal_time = get_current_time();
 		data->philos[i].data = data;
 	}
 }
 
-t_data	*initialize_data(int num_philos, int time_to_die, int time_to_eat, int time_to_sleep)
+t_data	*initialize_data(int num_philos, int time_to_die, int time_to_eat,
+		int time_to_sleep)
 {
 	t_data	*data;
 
@@ -52,4 +53,25 @@ t_data	*initialize_data(int num_philos, int time_to_die, int time_to_eat, int ti
 	init_mutexes_and_philos(data);
 	gettimeofday(&data->start_time, NULL);
 	return (data);
+}
+
+void	cleanup(t_data *data)
+{
+	int	i;
+
+	if (data)
+	{
+		if (data->forks)
+		{
+			i = -1;
+			while (++i < data->num_philos)
+				pthread_mutex_destroy(&data->forks[i]);
+			free(data->forks);
+		}
+		if (data->philos)
+			free(data->philos);
+		pthread_mutex_destroy(&data->print_mutex);
+		pthread_mutex_destroy(&data->death_mutex);
+		free(data);
+	}
 }

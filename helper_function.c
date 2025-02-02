@@ -6,7 +6,7 @@
 /*   By: sodahani <sodahani@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:34:41 by sodahani          #+#    #+#             */
-/*   Updated: 2025/01/30 17:48:24 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/02 12:03:06 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@ int	ft_isdigit(int c)
 		return (1);
 	return (0);
 }
+
 long	ft_atoi(const char *str)
 {
 	int					i;
@@ -44,6 +45,7 @@ long	ft_atoi(const char *str)
 	}
 	return (result * sign);
 }
+
 void	*ft_memcpy(void *dest, const void *src, size_t n)
 {
 	size_t	i;

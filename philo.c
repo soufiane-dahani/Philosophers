@@ -6,110 +6,51 @@
 /*   By: sodahani <sodahani@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:34:41 by sodahani          #+#    #+#             */
-/*   Updated: 2025/02/01 17:48:24 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/02 13:04:36 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
- 
-void define_the_thread(t_data *data)
+
+void	*philosopher_routine(void *arg)
 {
-    int i;
-    i = 0;
-    while (i < data->num_philos)
-    {
-        pthread_create(&data->philos[i].thread, NULL, philosopher_routine, &data->philos[i]);
-        i++;
-    }
+	t_philo	*philo;
+	long	time_since_last_meal;
+
+	philo = (t_philo *)arg;
+	while (1)
+	{
+		if (philo->data->dead)
+		{
+			break ;
+		}
+		time_since_last_meal = get_current_time() - philo->last_meal_time;
+		if (time_since_last_meal > philo->data->time_to_die)
+		{
+			philo->data->dead = 1;
+			printf("Philo %d has died\n", philo->id);
+			break ;
+		}
+		think(philo);
+		take_forks(philo);
+		eat(philo);
+		release_forks(philo);
+		philo_sleep(philo);
+	}
+	return (NULL);
 }
-long get_current_time(void)
-{
-    struct timeval tv;
-
-    gettimeofday(&tv, NULL);
-    return (tv.tv_sec * 1000) + (tv.tv_usec / 1000);
-}
-void philo_sleep(t_philo *philo)
-{
-    long start_time = get_current_time();
-    while (get_current_time() - start_time < philo->data->time_to_sleep)
-        usleep(100);
-}
-void think(t_philo *philo)
-{
-    printf("philo %d is thinking\n", philo->id);
-    usleep(500);
-}
-
-void take_forks(t_philo *philo)
-{
-    int left_fork = (philo->id - 1) % philo->data->num_philos;
-    int right_fork = philo->id % philo->data->num_philos;
-
-    int first_fork = (left_fork < right_fork) ? left_fork : right_fork;
-    int second_fork = (left_fork < right_fork) ? right_fork : left_fork;
-
-    pthread_mutex_lock(&philo->data->forks[first_fork]);
-    pthread_mutex_lock(&philo->data->forks[second_fork]);
-}
-void eat(t_philo *philo)
-{
-    printf("Philo %d is eating\n", philo->id);
-    
-    long start_time = get_current_time();
-    while (get_current_time() - start_time < philo->data->time_to_eat)
-    {
-        usleep(100);
-    }
-    printf("Philo %d has finished eating\n", philo->id);
-	philo->meals_eaten++;
-}
-
-
-void release_forks(t_philo *philo)
-{
-    int left_fork = (philo->id - 1) % philo->data->num_philos;
-    int right_fork = philo->id % philo->data->num_philos;
-
-    // Add resource hierarchy to prevent deadlock
-    int first_fork = (left_fork < right_fork) ? left_fork : right_fork;
-    int second_fork = (left_fork < right_fork) ? right_fork : left_fork;
-
-    pthread_mutex_unlock(&philo->data->forks[first_fork]);
-
-    pthread_mutex_unlock(&philo->data->forks[second_fork]);
-}
-
-
-void *philosopher_routine(void *arg)
-{
-    t_philo *philo = (t_philo *)arg;
-    
-
-    while (!philo->data->dead)
-    {
-        think(philo);
-        take_forks(philo);
-        eat(philo);
-        release_forks(philo);
-        philo_sleep(philo);
-    }
-    return NULL;
-}
-
-
 
 int	main(int ac, char const **av)
 {
-	int	*num;
-	int	capacity;
-	t_data *data;
-	int num_philos;
-    int time_to_die;
-    int time_to_eat;
-    int time_to_sleep;
-	// int must_eat_count;
+	int		*num;
+	int		capacity;
+	t_data	*data;
+	int		num_philos;
+	int		time_to_die;
+	int		time_to_eat;
+	int		time_to_sleep;
 
+	// int must_eat_count;
 	if (ac == 1)
 	{
 		write(2, "Error\n", 6);
@@ -132,7 +73,7 @@ int	main(int ac, char const **av)
 	if (!data)
 	{
 		write(2, "Memory allocation error\n", 24);
-		return(1);
+		return (1);
 	}
 	define_the_thread(data);
 	free(num);
