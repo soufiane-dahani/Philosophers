@@ -6,7 +6,7 @@
 /*   By: sodahani <sodahani@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:35:01 by sodahani          #+#    #+#             */
-/*   Updated: 2025/02/02 12:01:11 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/03 11:14:05 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ typedef struct s_philo
 {
 	int				id;
 	int				meals_eaten;
+	int				has_forks;
 	long long		last_meal_time;
 	pthread_t		thread;
 	struct s_data	*data;
@@ -35,7 +36,7 @@ typedef struct s_data
 	int				time_to_die;
 	int				time_to_eat;
 	int				time_to_sleep;
-	int				must_eat_count;
+	unsigned int	must_eat_count;
 	int				dead;
 	struct timeval	start_time;
 	pthread_mutex_t	*forks;
