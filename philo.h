@@ -6,7 +6,7 @@
 /*   By: sodahani <sodahani@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:35:01 by sodahani          #+#    #+#             */
-/*   Updated: 2025/02/04 12:45:09 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/04 16:56:14 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ typedef struct s_philo
 	int				has_first_fork;
 	long long		last_meal_time;
 	pthread_t		thread;
+	pthread_t		monitor_thread;
 	struct s_data	*data;
 }					t_philo;
 

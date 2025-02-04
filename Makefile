@@ -8,7 +8,7 @@ NAME = philo
 NAMEB = philo_bonus
 CC = cc
 RM = rm -f
-CFLAGS = -Wall -Wextra -Werror -fsanitize=thread
+CFLAGS = -Wall -Wextra -Werror #-fsanitize=thread
 ${NAME}: ${OBJS}
 	$(CC) $(CFLAGS) ${OBJS} -o ${NAME}
 

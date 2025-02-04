@@ -6,7 +6,7 @@
 /*   By: sodahani <sodahani@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:34:41 by sodahani          #+#    #+#             */
-/*   Updated: 2025/02/04 12:47:39 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/04 17:06:20 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,31 +25,35 @@ int check_if_dead(t_philo *philo)
 }
 void check_print(t_philo *philo, int i)
 {
+    long timestamp;
+
     pthread_mutex_lock(&philo->data->print_mutex);
     pthread_mutex_lock(&philo->data->death_mutex);
-    
+
+    timestamp = get_current_time() - ((philo->data->start_time.tv_sec * 1000) + (philo->data->start_time.tv_usec / 1000)); 
+
     if (i == 5)
     {
         if (!philo->data->dead)
         {
             philo->data->dead = 1;
-            printf("Philo %d has died\n", philo->id);
+            printf("%ld %d died\n", timestamp, philo->id);
         }
     }
     else if (!philo->data->dead)
     {
         if (i == 0)
-            printf("philo %d is sleeping\n", philo->id);
-        if (i == 1)
-            printf("philo %d is thinking\n", philo->id);
-        if (i == 2)
-            printf("Philo %d is eating\n", philo->id);
-        if (i == 3)
-            printf("Philo %d has finished eating\n", philo->id);
-        if (i == 4)
-            printf("Philo %d is trying to take fork\n", philo->id);
+            printf("%ld %d is sleeping\n", timestamp, philo->id);
+        else if (i == 1)
+            printf("%ld %d is thinking\n", timestamp, philo->id);
+        else if (i == 2)
+            printf("%ld %d is eating\n", timestamp, philo->id);
+        else if (i == 3)
+            printf("%ld %d has finished eating\n", timestamp, philo->id);
+        else if (i == 4)
+            printf("%ld %d has taken a fork\n", timestamp, philo->id);
     }
-    
+
     pthread_mutex_unlock(&philo->data->death_mutex);
     pthread_mutex_unlock(&philo->data->print_mutex);
 }
@@ -72,7 +76,7 @@ void	think(t_philo *philo)
 	if (!check_if_dead(philo))
 	{
 		check_print(philo, 1);
-		usleep(1000);
+		usleep(100);
 	}
 }
 void	eat(t_philo *philo)
@@ -90,7 +94,7 @@ void	eat(t_philo *philo)
 	}
 	if (!check_if_dead(philo))
 	{
-		check_print(philo, 3);
+		//check_print(philo, 3);
 		philo->meals_eaten++;
 	}
 }
@@ -115,14 +119,14 @@ void take_forks(t_philo *philo)
     
     if (!check_if_dead(philo))
     {
-        check_print(philo, 4);
         pthread_mutex_lock(&philo->data->forks[first_fork]);
+		check_print(philo, 4);
         philo->has_first_fork = 1;
 
         if (!check_if_dead(philo))
         {
-            check_print(philo, 4);
             pthread_mutex_lock(&philo->data->forks[second_fork]);
+			check_print(philo, 4);
             philo->has_second_fork = 1;
         }
         else 
