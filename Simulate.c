@@ -6,7 +6,7 @@
 /*   By: sodahani <sodahani@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:34:41 by sodahani          #+#    #+#             */
-/*   Updated: 2025/02/04 11:32:21 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/04 12:47:39 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,13 +30,13 @@ void check_print(t_philo *philo, int i)
     
     if (i == 5)
     {
-        if (!philo->data->dead)  // Only the first death message will be printed
+        if (!philo->data->dead)
         {
             philo->data->dead = 1;
             printf("Philo %d has died\n", philo->id);
         }
     }
-    else if (!philo->data->dead)  // Regular messages only if no one is dead
+    else if (!philo->data->dead)
     {
         if (i == 0)
             printf("philo %d is sleeping\n", philo->id);
@@ -109,20 +109,26 @@ void take_forks(t_philo *philo)
         first_fork = second_fork;
         second_fork = temp;
     }
+
+    philo->has_first_fork = 0;
+    philo->has_second_fork = 0;
     
     if (!check_if_dead(philo))
     {
         check_print(philo, 4);
         pthread_mutex_lock(&philo->data->forks[first_fork]);
-        
+        philo->has_first_fork = 1;
+
         if (!check_if_dead(philo))
         {
             check_print(philo, 4);
             pthread_mutex_lock(&philo->data->forks[second_fork]);
+            philo->has_second_fork = 1;
         }
         else 
         {
             pthread_mutex_unlock(&philo->data->forks[first_fork]);
+            philo->has_first_fork = 0;
         }
     }
 }
@@ -134,14 +140,17 @@ void release_forks(t_philo *philo)
         
     int first_fork = philo->id - 1;
     int second_fork = philo->id % philo->data->num_philos;
-    
+
     if (first_fork > second_fork)
     {
         int temp = first_fork;
         first_fork = second_fork;
         second_fork = temp;
     }
-    
-    pthread_mutex_unlock(&philo->data->forks[second_fork]);
-    pthread_mutex_unlock(&philo->data->forks[first_fork]);
+
+    if (philo->has_second_fork)
+        pthread_mutex_unlock(&philo->data->forks[second_fork]);
+    if (philo->has_first_fork)
+        pthread_mutex_unlock(&philo->data->forks[first_fork]);
 }
+
