@@ -6,7 +6,7 @@
 /*   By: sodahani <sodahani@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:35:01 by sodahani          #+#    #+#             */
-/*   Updated: 2025/02/03 11:14:05 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/04 11:04:21 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,5 +69,9 @@ void				*philosopher_routine(void *arg);
 void				take_forks(t_philo *philo);
 void				release_forks(t_philo *philo);
 void				define_the_thread(t_data *data);
+
+int check_if_dead(t_philo *philo);
+void check_print(t_philo *philo, int i);
+void	cleanup(t_data *data);
 
 #endif
