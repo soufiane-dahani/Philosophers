@@ -6,7 +6,7 @@
 /*   By: sodahani <sodahani@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:35:01 by sodahani          #+#    #+#             */
-/*   Updated: 2025/02/04 16:56:14 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/04 17:34:04 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,13 +23,14 @@
 typedef struct s_philo
 {
 	int				id;
-	int				meals_eaten;
+	unsigned int	meals_eaten;
 	int				has_forks;
 	int				has_second_fork;
 	int				has_first_fork;
 	long long		last_meal_time;
 	pthread_t		thread;
 	pthread_t		monitor_thread;
+	pthread_t		monitor_dead;
 	struct s_data	*data;
 }					t_philo;
 
@@ -43,6 +44,7 @@ typedef struct s_data
 	int				dead;
 	struct timeval	start_time;
 	pthread_mutex_t	*forks;
+	pthread_mutex_t meal_mutex;
 	pthread_mutex_t	print_mutex;
 	pthread_mutex_t	death_mutex;
 	t_philo			*philos;

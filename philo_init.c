@@ -6,7 +6,7 @@
 /*   By: sodahani <sodahani@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:34:41 by sodahani          #+#    #+#             */
-/*   Updated: 2025/02/03 09:54:02 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/04 17:31:55 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@ static void	init_mutexes_and_philos(t_data *data)
 		pthread_mutex_init(&data->forks[i], NULL);
 	pthread_mutex_init(&data->print_mutex, NULL);
 	pthread_mutex_init(&data->death_mutex, NULL);
+	pthread_mutex_init(&data->meal_mutex, NULL);
 	i = -1;
 	while (++i < data->num_philos)
 	{
@@ -72,6 +73,7 @@ void	cleanup(t_data *data)
 			free(data->philos);
 		pthread_mutex_destroy(&data->print_mutex);
 		pthread_mutex_destroy(&data->death_mutex);
+		pthread_mutex_destroy(&data->meal_mutex);
 		free(data);
 	}
 }

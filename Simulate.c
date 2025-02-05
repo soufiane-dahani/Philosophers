@@ -6,7 +6,7 @@
 /*   By: sodahani <sodahani@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:34:41 by sodahani          #+#    #+#             */
-/*   Updated: 2025/02/04 17:06:20 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/04 22:08:02 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,7 +76,7 @@ void	think(t_philo *philo)
 	if (!check_if_dead(philo))
 	{
 		check_print(philo, 1);
-		usleep(100);
+		//usleep(100);
 	}
 }
 void	eat(t_philo *philo)
@@ -85,7 +85,9 @@ void	eat(t_philo *philo)
 
 	if (!check_if_dead(philo))
 		check_print(philo, 2);
+	pthread_mutex_lock(&philo->data->meal_mutex);
 	philo->last_meal_time = get_current_time();
+	pthread_mutex_unlock(&philo->data->meal_mutex);
 	start_time = get_current_time();
 	while ((get_current_time() - start_time < philo->data->time_to_eat)
 		&& !check_if_dead(philo))
@@ -95,7 +97,9 @@ void	eat(t_philo *philo)
 	if (!check_if_dead(philo))
 	{
 		//check_print(philo, 3);
+		pthread_mutex_lock(&philo->data->meal_mutex);
 		philo->meals_eaten++;
+		pthread_mutex_unlock(&philo->data->meal_mutex);
 	}
 }
 

@@ -6,7 +6,7 @@
 /*   By: sodahani <sodahani@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:34:41 by sodahani          #+#    #+#             */
-/*   Updated: 2025/02/04 17:01:50 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/04 21:46:30 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 void	*philosopher_routine(void *arg)
 {
 	t_philo	*philo;
-	long	time_since_last_meal;
+	//long	time_since_last_meal;
 	long timestamp;
 	
 	philo = (t_philo *)arg;
@@ -25,7 +25,7 @@ void	*philosopher_routine(void *arg)
 		if (philo->data->dead)
 		{
 			pthread_mutex_unlock(&philo->data->death_mutex);
-			break ;
+			return(NULL);
 		}
 		pthread_mutex_unlock(&philo->data->death_mutex);
 		timestamp = get_current_time() - ((philo->data->start_time.tv_sec * 1000) + (philo->data->start_time.tv_usec / 1000));
@@ -38,16 +38,16 @@ void	*philosopher_routine(void *arg)
 			printf("%ld %d died\n", timestamp, philo->id);
 			return (NULL);
 		}
-		pthread_mutex_lock(&philo->data->death_mutex);
-		time_since_last_meal = get_current_time() - philo->last_meal_time;
-		if ((time_since_last_meal > philo->data->time_to_die))
-		{
-			philo->data->dead = 1;
-			pthread_mutex_unlock(&philo->data->death_mutex);
-			printf("%ld %d died\n", timestamp, philo->id);
-			return (NULL);
-		}
-		pthread_mutex_unlock(&philo->data->death_mutex);
+		// pthread_mutex_lock(&philo->data->death_mutex);
+		// time_since_last_meal = get_current_time() - philo->last_meal_time;
+		// if ((time_since_last_meal > philo->data->time_to_die))
+		// {
+		// 	philo->data->dead = 1;
+		// 	pthread_mutex_unlock(&philo->data->death_mutex);
+		// 	printf("%ld %d died\n", timestamp, philo->id);
+		// 	return (NULL);
+		// }
+		// pthread_mutex_unlock(&philo->data->death_mutex);
 		think(philo);
 		take_forks(philo);
 		eat(philo);
@@ -91,6 +91,14 @@ int	main(int ac, char const **av)
 	data->must_eat_count = 2147483648;
 	if (capacity == 5)
 		data->must_eat_count = num[4];
+	if (data->must_eat_count == 0)
+	{
+		printf("all philosophers have finished their meals\n");
+		free(num);
+		cleanup(data);
+		return (0);
+	}
 	define_the_thread(data);
 	free(num);
+	cleanup(data);
 }
