@@ -47,7 +47,7 @@ int start_simulation(t_data *data)
         return (1);
     }
     
-    pthread_detach(monitor); // ✅ FIX: Do NOT join the monitor thread
+    pthread_detach(monitor);
 
     for (i = 0; i < data->num_philos; i++)
         pthread_join(data->philos[i].thread, NULL);
@@ -109,8 +109,6 @@ void *philosopher_routine(void *arg)
         print_status(philo, "is thinking");
 
         pick_forks(philo);
-
-        // ✅ FIX: Update `last_meal_time` BEFORE eating
         pthread_mutex_lock(&philo->meal_mutex);
         philo->last_meal_time = get_current_time();
         pthread_mutex_unlock(&philo->meal_mutex);
@@ -118,10 +116,8 @@ void *philosopher_routine(void *arg)
         print_status(philo, "has taken a fork");
         print_status(philo, "is eating");
 
-        // ✅ FIX: Use `smart_sleep()`
         smart_sleep(philo, philo->data->time_to_eat);
 
-        // ✅ Increase meal count **AFTER** eating
         pthread_mutex_lock(&philo->meal_mutex);
         philo->meals_eaten++;
         pthread_mutex_unlock(&philo->meal_mutex);
@@ -144,33 +140,39 @@ void pick_forks(t_philo *philo)
     int left_fork = philo->id - 1;
     int right_fork = philo->id % philo->data->num_philos;
 
-    // ✅ FIX: Delay even philosophers slightly to prevent deadlocks
     if (philo->id % 2 == 0)
         usleep(200);
-
-    pthread_mutex_lock(&philo->data->forks[left_fork]);
-    pthread_mutex_lock(&philo->data->forks[right_fork]);
+    if (philo->id % 2 == 0)
+    {
+        pthread_mutex_lock(&philo->data->forks[right_fork]);
+        pthread_mutex_lock(&philo->data->forks[left_fork]);
+    }
+    else
+    {
+        pthread_mutex_lock(&philo->data->forks[left_fork]);
+        pthread_mutex_lock(&philo->data->forks[right_fork]);
+    }
 }
 
 
-void	release_forks(t_philo *philo)
+
+void release_forks(t_philo *philo)
 {
-	int	left_fork;
-	int	right_fork;
+    int left_fork = philo->id - 1;
+    int right_fork = philo->id % philo->data->num_philos;
 
-	left_fork = philo->id - 1;
-	right_fork = philo->id % philo->data->num_philos;
-	if (philo->id % 2 == 0)
-	{
-		pthread_mutex_unlock(&philo->data->forks[right_fork]);
-		pthread_mutex_unlock(&philo->data->forks[left_fork]);
-	}
-	else
-	{
-		pthread_mutex_unlock(&philo->data->forks[left_fork]);
-		pthread_mutex_unlock(&philo->data->forks[right_fork]);
-	}
+    if (philo->id % 2 == 0)
+    {
+        pthread_mutex_unlock(&philo->data->forks[left_fork]);
+        pthread_mutex_unlock(&philo->data->forks[right_fork]);
+    }
+    else
+    {
+        pthread_mutex_unlock(&philo->data->forks[right_fork]);
+        pthread_mutex_unlock(&philo->data->forks[left_fork]);
+    }
 }
+
 
 void *monitor_death(void *arg)
 {
@@ -190,8 +192,6 @@ void *monitor_death(void *arg)
             long long current_time_ms = (current_time.tv_sec * 1000) +
                                         (current_time.tv_usec / 1000);
             pthread_mutex_unlock(&data->philos[i].meal_mutex);
-
-            // ✅ FIX: Add a **small buffer time** before killing the philosopher
             if ((current_time_ms - last_meal_time_ms) >= data->time_to_die + 5)
             {
                 print_status(&data->philos[i], "died");
@@ -201,7 +201,7 @@ void *monitor_death(void *arg)
                 return (NULL);
             }
         }
-        usleep(2000); // ✅ Reduced CPU load
+        usleep(2000);
     }
     return (NULL);
 }
