@@ -23,6 +23,15 @@
 
 typedef struct s_data	t_data;
 
+typedef struct s_init
+{
+	int					num_philos;
+	int					time_to_die;
+	int					time_to_eat;
+	int					time_to_sleep;
+	unsigned int		must_eat_count;
+}						t_init;
+
 typedef struct s_philo
 {
 	int					id;
@@ -32,7 +41,7 @@ typedef struct s_philo
 	pthread_t			thread;
 	pthread_t			monitor_thread;
 	pthread_t			monitor_dead;
-	pthread_mutex_t meal_mutex; // Added for thread safety
+	pthread_mutex_t		meal_mutex;
 	t_data				*data;
 }						t_philo;
 
@@ -66,9 +75,7 @@ int						*convert_to_integers(char **res, int *capacity);
 long					ft_atoi(const char *str);
 void					free_string_array(char **arr);
 int						check_min_max(char **res);
-t_data					*initialize_data(int num_philos, int time_to_die,
-							int time_to_eat, int time_to_sleep,
-							unsigned int must_eat_count);
+t_data					*initialize_data(t_init init);
 
 long long				get_current_time_ms(void);
 int						start_simulation(t_data *data);
@@ -81,5 +88,6 @@ void					print_status(t_philo *philo, const char *status);
 struct timeval			get_current_time(void);
 
 void					*philosopher_routine(void *arg);
-
+void					free_data(t_data *data);
+int						check_if_dead(t_philo *philo);
 #endif
