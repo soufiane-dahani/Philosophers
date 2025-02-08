@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sodahani <sodahani@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: sodahani <sodahani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:34:41 by sodahani          #+#    #+#             */
-/*   Updated: 2025/02/04 21:46:30 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/08 20:20:47 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,6 +74,13 @@ int	main(int ac, char const **av)
 	{
 		printf("all philosophers have finished their meals\n");
 		free_data(data);
+		return (0);
+	}
+	if (data->num_philos == 1)
+	{
+		printf("0 1 is thinking\n");
+		usleep(data->time_to_die * 1000);
+		printf("%d 1 died\n", data->time_to_die);
 		return (0);
 	}
 	start_simulation(data);
