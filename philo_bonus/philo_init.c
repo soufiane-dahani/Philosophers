@@ -6,7 +6,7 @@
 /*   By: sodahani <sodahani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:34:41 by sodahani          #+#    #+#             */
-/*   Updated: 2025/02/09 18:22:24 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/09 22:36:47 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,8 @@
 
 static int	init_forks(t_data *data)
 {
-	data->forks = sem_open("/forks", O_CREAT, 0644, data->num_philos);
+	sem_unlink("/forks");
+	data->forks = sem_open("/forks", O_CREAT | O_EXCL, 0644, data->num_philos);
 	if (data->forks == SEM_FAILED)
 	{
 		write(2, "Error: sem_open failed\n", 23);
@@ -25,9 +26,12 @@ static int	init_forks(t_data *data)
 
 static int	init_global_sems(t_data *data)
 {
-	data->print_sem = sem_open("/print", O_CREAT, 0644, 1);
-	data->meal_sem = sem_open("/meal_check", O_CREAT, 0644, 1);
-	data->death_sem = sem_open("/death_sem", O_CREAT, 0644, 1);
+	sem_unlink("/print");
+	sem_unlink("/meal_check");
+	sem_unlink("/death_sem");
+	data->print_sem = sem_open("/print", O_CREAT | O_EXCL, 0644, 1);
+	data->meal_sem = sem_open("/meal_check", O_CREAT | O_EXCL, 0644, 1);
+	data->death_sem = sem_open("/death_sem", O_CREAT | O_EXCL, 0644, 1);
 	if (data->print_sem == SEM_FAILED || data->meal_sem == SEM_FAILED
 		|| data->death_sem == SEM_FAILED)
 	{
@@ -78,7 +82,12 @@ t_data	*initialize_data(t_init init)
 	if (!data->philos)
 		return (free(data), NULL);
 	if (init_sem_and_philos(data))
-		return (free(data->philos), free(data), NULL);
+	{
+		cleanup_sems(data);
+		free(data->philos);
+		free(data);
+		return (NULL);
+	}
 	gettimeofday(&data->start_time, NULL);
 	return (data);
 }

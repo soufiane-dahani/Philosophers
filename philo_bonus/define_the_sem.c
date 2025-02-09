@@ -6,7 +6,7 @@
 /*   By: sodahani <sodahani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:34:41 by sodahani          #+#    #+#             */
-/*   Updated: 2025/02/09 19:21:00 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/09 22:31:20 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,10 +25,12 @@ static void	terminate_processes(t_data *data)
 	}
 }
 
-static void	wait_and_sem_close(t_data *data, pid_t pid)
+static void	wait_and_sem_close(t_data *data)
 {
-	int	status;
+	int		status;
+	pid_t	pid;
 
+	pid = 0;
 	while ((pid = waitpid(-1, &status, 0)) > 0)
 	{
 		if (WIFEXITED(status) || WIFSIGNALED(status))
@@ -50,7 +52,6 @@ static void	wait_and_sem_close(t_data *data, pid_t pid)
 int	start_simulation(t_data *data)
 {
 	size_t	i;
-	pid_t	pid;
 
 	i = 0;
 	while (i < data->num_philos)
@@ -69,6 +70,6 @@ int	start_simulation(t_data *data)
 		}
 		i++;
 	}
-	wait_and_sem_close(data, pid);
+	wait_and_sem_close(data);
 	return (0);
 }

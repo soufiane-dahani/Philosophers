@@ -6,7 +6,7 @@
 /*   By: sodahani <sodahani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:35:01 by sodahani          #+#    #+#             */
-/*   Updated: 2025/02/09 19:36:38 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/09 22:35:12 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@
 # include <stdlib.h>
 # include <sys/time.h>
 # include <sys/types.h>
+# include <sys/wait.h>
 # include <unistd.h>
 
 typedef struct s_data	t_data;
@@ -80,5 +81,6 @@ long long				get_current_time_ms(void);
 int						start_simulation(t_data *data);
 struct timeval			get_current_time(void);
 void					philosopher_lifecycle(t_philo *philo);
+void					cleanup_sems(t_data *data);
 
 #endif
