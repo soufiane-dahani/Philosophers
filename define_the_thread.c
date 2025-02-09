@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   define_the_thread.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sodahani <sodahani@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: sodahani <sodahani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:34:41 by sodahani          #+#    #+#             */
-/*   Updated: 2025/02/04 22:08:28 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/09 13:57:32 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,13 +28,13 @@ int	start_simulation(t_data *data)
 	}
 	if (pthread_create(&monitor, NULL, monitor_death, data) != 0)
 		return (write(2, "Error: Failed to create monitor thread\n", 40), 1);
-	pthread_detach(monitor);
 	i = 0;
 	while (i < data->num_philos)
 	{
 		pthread_join(data->philos[i].thread, NULL);
 		i++;
 	}
+	pthread_join(monitor, NULL);
 	free_data(data);
 	return (0);
 }
@@ -54,10 +54,10 @@ void	print_status(t_philo *philo, const char *status)
 		pthread_mutex_unlock(&philo->data->death_mutex);
 		return ;
 	}
-	pthread_mutex_unlock(&philo->data->death_mutex);
 	pthread_mutex_lock(&philo->data->print_mutex);
 	printf("%lld %d %s\n", timestamp, philo->id, status);
 	pthread_mutex_unlock(&philo->data->print_mutex);
+	pthread_mutex_unlock(&philo->data->death_mutex);
 }
 
 int	check_if_dead(t_philo *philo)
@@ -82,7 +82,7 @@ static int	check_philosopher_death(t_data *data, size_t i,
 	current_time_ms = (current_time.tv_sec * 1000) + (current_time.tv_usec
 			/ 1000);
 	pthread_mutex_unlock(&data->philos[i].meal_mutex);
-	if ((current_time_ms - last_meal_time_ms) >= data->time_to_die + 5)
+	if ((current_time_ms - last_meal_time_ms) >= data->time_to_die)
 	{
 		print_status(&data->philos[i], "died");
 		pthread_mutex_lock(&data->death_mutex);
@@ -110,7 +110,8 @@ void	*monitor_death(void *arg)
 				return (NULL);
 			i++;
 		}
-		usleep(2000);
+		if(data->num_philos % 2 != 0)
+			usleep(200);
 	}
 	return (NULL);
 }

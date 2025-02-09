@@ -6,7 +6,7 @@
 /*   By: sodahani <sodahani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:34:41 by sodahani          #+#    #+#             */
-/*   Updated: 2025/02/08 20:55:15 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/08 22:54:52 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,10 +58,18 @@ void	pick_forks(t_philo *philo)
 
 	left_fork = philo->id - 1;
 	right_fork = philo->id % philo->data->num_philos;
+	if (philo->id % 2 != 0)
+		usleep(2000);
 	if (philo->id % 2 == 0)
-		usleep(200);
-	pthread_mutex_lock(&philo->data->forks[left_fork]);
-	pthread_mutex_lock(&philo->data->forks[right_fork]);
+	{
+		pthread_mutex_lock(&philo->data->forks[right_fork]);
+		pthread_mutex_lock(&philo->data->forks[left_fork]);
+	}
+	else
+	{
+		pthread_mutex_lock(&philo->data->forks[left_fork]);
+		pthread_mutex_lock(&philo->data->forks[right_fork]);
+	}
 }
 
 void	release_forks(t_philo *philo)
@@ -71,6 +79,8 @@ void	release_forks(t_philo *philo)
 
 	left_fork = philo->id - 1;
 	right_fork = philo->id % philo->data->num_philos;
+	if (philo->id % 2 != 0)
+		usleep(100);
 	if (philo->id % 2 == 0)
 	{
 		pthread_mutex_unlock(&philo->data->forks[right_fork]);
