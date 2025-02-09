@@ -6,7 +6,7 @@
 /*   By: sodahani <sodahani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:34:41 by sodahani          #+#    #+#             */
-/*   Updated: 2025/02/09 22:36:47 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/09 23:05:50 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,6 +78,7 @@ t_data	*initialize_data(t_init init)
 	data->time_to_eat = init.time_to_eat;
 	data->time_to_sleep = init.time_to_sleep;
 	data->must_eat_count = init.must_eat_count;
+	data->is_dead = 0;
 	data->philos = malloc(sizeof(t_philo) * init.num_philos);
 	if (!data->philos)
 		return (free(data), NULL);

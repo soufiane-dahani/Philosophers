@@ -6,7 +6,7 @@
 /*   By: sodahani <sodahani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:35:01 by sodahani          #+#    #+#             */
-/*   Updated: 2025/02/09 22:35:12 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/09 23:05:13 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,7 @@ typedef struct s_data
 	int					time_to_sleep;
 	unsigned int		must_eat_count;
 	struct timeval		start_time;
+	int					is_dead;
 	sem_t				*forks;
 	sem_t				*meal_sem;
 	sem_t				*print_sem;
@@ -82,5 +83,7 @@ int						start_simulation(t_data *data);
 struct timeval			get_current_time(void);
 void					philosopher_lifecycle(t_philo *philo);
 void					cleanup_sems(t_data *data);
+void					print_status(t_philo *philo, const char *status);
 
+int						check_if_dead(t_philo *philo);
 #endif
