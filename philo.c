@@ -6,7 +6,7 @@
 /*   By: sodahani <sodahani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:34:41 by sodahani          #+#    #+#             */
-/*   Updated: 2025/02/09 14:26:59 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/09 15:39:04 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,6 +88,7 @@ int	main(int ac, char const **av)
 		printf("0 1 is thinking\n");
 		usleep(data->time_to_die * 1000);
 		printf("%d 1 died\n", data->time_to_die);
+		free_data(data);
 		return (0);
 	}
 	start_simulation(data);
