@@ -6,19 +6,23 @@
 /*   By: sodahani <sodahani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:35:01 by sodahani          #+#    #+#             */
-/*   Updated: 2025/02/09 15:01:17 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/09 18:58:47 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef PHILO_H
 # define PHILO_H
 
+# include <fcntl.h>
 # include <limits.h>
 # include <pthread.h>
+# include <semaphore.h>
+# include <signal.h>
 # include <stdbool.h>
 # include <stdio.h>
 # include <stdlib.h>
 # include <sys/time.h>
+# include <sys/types.h>
 # include <unistd.h>
 
 typedef struct s_data	t_data;
@@ -38,10 +42,7 @@ typedef struct s_philo
 	unsigned int		meals_eaten;
 	bool				has_fork;
 	struct timeval		last_meal_time;
-	pthread_t			thread;
-	pthread_t			monitor_thread;
-	pthread_t			monitor_dead;
-	pthread_mutex_t		meal_mutex;
+	pid_t				pid;
 	t_data				*data;
 }						t_philo;
 
@@ -52,12 +53,11 @@ typedef struct s_data
 	int					time_to_eat;
 	int					time_to_sleep;
 	unsigned int		must_eat_count;
-	bool				dead;
 	struct timeval		start_time;
-	pthread_mutex_t		*forks;
-	pthread_mutex_t		meal_mutex;
-	pthread_mutex_t		print_mutex;
-	pthread_mutex_t		death_mutex;
+	sem_t				*forks;
+	sem_t				*meal_sem;
+	sem_t				*print_sem;
+	sem_t				*death_sem;
 	t_philo				*philos;
 }						t_data;
 

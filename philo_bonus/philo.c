@@ -6,7 +6,7 @@
 /*   By: sodahani <sodahani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:34:41 by sodahani          #+#    #+#             */
-/*   Updated: 2025/02/09 15:57:41 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/09 18:25:48 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,10 +77,18 @@ int	main(int ac, char const **av)
 	data = setup_data(num, capacity);
 	if (!data)
 		return (write(2, "Memory allocation error\n", 24), 1);
+	if (data->num_philos == 1)
+	{
+		printf("0 1 is thinking\n");
+		usleep(data->time_to_die * 1000);
+		printf("%d 1 died\n", data->time_to_die);
+		//free_data(data);
+		return (0);
+	}
 	if (data->must_eat_count == 0)
 	{
 		printf("all philosophers have finished their meals\n");
-		free_data(data);
+		//free_data(data);
 		return (0);
 	}
 	return (0);
