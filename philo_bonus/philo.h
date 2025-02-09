@@ -6,7 +6,7 @@
 /*   By: sodahani <sodahani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:35:01 by sodahani          #+#    #+#             */
-/*   Updated: 2025/02/09 18:58:47 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/09 19:36:38 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,19 +76,9 @@ long					ft_atoi(const char *str);
 void					free_string_array(char **arr);
 int						check_min_max(char **res);
 t_data					*initialize_data(t_init init);
-
 long long				get_current_time_ms(void);
 int						start_simulation(t_data *data);
-void					pick_forks(t_philo *philo);
-void					release_forks(t_philo *philo);
-
-void					*monitor_death(void *arg);
-void					print_status(t_philo *philo, const char *status);
-
 struct timeval			get_current_time(void);
+void					philosopher_lifecycle(t_philo *philo);
 
-void					*philosopher_routine(void *arg);
-void					free_data(t_data *data);
-int						check_if_dead(t_philo *philo);
-int						check_meals(t_data *data);
 #endif
