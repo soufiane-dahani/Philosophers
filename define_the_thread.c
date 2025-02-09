@@ -6,7 +6,7 @@
 /*   By: sodahani <sodahani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:34:41 by sodahani          #+#    #+#             */
-/*   Updated: 2025/02/09 13:57:32 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/09 14:16:16 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,16 +48,14 @@ void	print_status(t_philo *philo, const char *status)
 	timestamp = ((current_time.tv_sec * 1000) + (current_time.tv_usec / 1000))
 		- ((philo->data->start_time.tv_sec * 1000)
 			+ (philo->data->start_time.tv_usec / 1000));
-	pthread_mutex_lock(&philo->data->death_mutex);
-	if (philo->data->dead)
-	{
-		pthread_mutex_unlock(&philo->data->death_mutex);
+	if (check_if_dead(philo))
 		return ;
+	if (!check_if_dead(philo))
+	{
+		pthread_mutex_lock(&philo->data->print_mutex);
+		printf("%lld %d %s\n", timestamp, philo->id, status);
+		pthread_mutex_unlock(&philo->data->print_mutex);
 	}
-	pthread_mutex_lock(&philo->data->print_mutex);
-	printf("%lld %d %s\n", timestamp, philo->id, status);
-	pthread_mutex_unlock(&philo->data->print_mutex);
-	pthread_mutex_unlock(&philo->data->death_mutex);
 }
 
 int	check_if_dead(t_philo *philo)
@@ -75,6 +73,7 @@ static int	check_philosopher_death(t_data *data, size_t i,
 {
 	long long	last_meal_time_ms;
 	long long	current_time_ms;
+	long long	timestamp;
 
 	pthread_mutex_lock(&data->philos[i].meal_mutex);
 	last_meal_time_ms = (data->philos[i].last_meal_time.tv_sec * 1000)
@@ -84,9 +83,15 @@ static int	check_philosopher_death(t_data *data, size_t i,
 	pthread_mutex_unlock(&data->philos[i].meal_mutex);
 	if ((current_time_ms - last_meal_time_ms) >= data->time_to_die)
 	{
-		print_status(&data->philos[i], "died");
 		pthread_mutex_lock(&data->death_mutex);
 		data->dead = 1;
+		gettimeofday(&current_time, NULL);
+		timestamp = ((current_time.tv_sec * 1000) + (current_time.tv_usec
+					/ 1000)) - ((data->start_time.tv_sec * 1000)
+				+ (data->start_time.tv_usec / 1000));
+		pthread_mutex_lock(&data->print_mutex);
+		printf("%lld %d %s\n", timestamp, data->philos[i].id, "died");
+		pthread_mutex_unlock(&data->print_mutex);
 		pthread_mutex_unlock(&data->death_mutex);
 		return (1);
 	}
@@ -110,7 +115,7 @@ void	*monitor_death(void *arg)
 				return (NULL);
 			i++;
 		}
-		if(data->num_philos % 2 != 0)
+		if (data->num_philos % 2 != 0)
 			usleep(200);
 	}
 	return (NULL);

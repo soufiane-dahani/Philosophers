@@ -6,7 +6,7 @@
 /*   By: sodahani <sodahani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:34:41 by sodahani          #+#    #+#             */
-/*   Updated: 2025/02/08 20:20:47 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/09 14:26:59 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,13 @@ static int	validate_args(int ac, char const **av, int *capacity, int **num)
 	if (!(*num) || (*capacity != 4 && *capacity != 5))
 	{
 		write(2, "Error\n", 6);
+		if (*num)
+			free(*num);
+		return (1);
+	}
+	if (*num[0] > 200)
+	{
+		write(2, "Please enter fewer than 201 philos\n", 35);
 		if (*num)
 			free(*num);
 		return (1);
