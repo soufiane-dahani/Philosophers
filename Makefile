@@ -1,5 +1,5 @@
 SRCS = ft_split.c ft_strdup.c ft_strjoin.c philo.c helper_function.c philo_init.c \
-		define_the_thread.c Simulate.c 
+		define_the_thread.c Simulate.c meals.c
 SRCSB =
 
 OBJS = ${SRCS:.c=.o}

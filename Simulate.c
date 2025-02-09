@@ -6,7 +6,7 @@
 /*   By: sodahani <sodahani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:34:41 by sodahani          #+#    #+#             */
-/*   Updated: 2025/02/09 14:13:44 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/09 14:47:26 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,10 +38,10 @@ void	*philosopher_routine(void *arg)
 		pthread_mutex_unlock(&philo->meal_mutex);
 		print_status(philo, "has taken a fork");
 		print_status(philo, "is eating");
-		smart_sleep(philo, philo->data->time_to_eat);
 		pthread_mutex_lock(&philo->meal_mutex);
 		philo->meals_eaten++;
 		pthread_mutex_unlock(&philo->meal_mutex);
+		smart_sleep(philo, philo->data->time_to_eat);
 		release_forks(philo);
 		if (check_if_dead(philo))
 			return (NULL);

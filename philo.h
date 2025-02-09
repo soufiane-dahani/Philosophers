@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sodahani <sodahani@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: sodahani <sodahani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:35:01 by sodahani          #+#    #+#             */
-/*   Updated: 2025/02/04 17:34:04 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/09 15:01:17 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,4 +90,5 @@ struct timeval			get_current_time(void);
 void					*philosopher_routine(void *arg);
 void					free_data(t_data *data);
 int						check_if_dead(t_philo *philo);
+int						check_meals(t_data *data);
 #endif

@@ -6,7 +6,7 @@
 /*   By: sodahani <sodahani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:34:41 by sodahani          #+#    #+#             */
-/*   Updated: 2025/02/09 14:16:16 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/09 15:05:54 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,6 +108,8 @@ void	*monitor_death(void *arg)
 	while (1)
 	{
 		i = 0;
+		if (check_meals(data))
+			return (NULL);
 		while (i < data->num_philos)
 		{
 			gettimeofday(&current_time, NULL);
