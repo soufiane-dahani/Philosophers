@@ -6,7 +6,7 @@
 /*   By: sodahani <sodahani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:34:41 by sodahani          #+#    #+#             */
-/*   Updated: 2025/02/11 21:14:54 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/11 22:39:35 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,13 +40,15 @@ void	philosopher_lifecycle(t_philo *philo)
 		usleep(data->time_to_eat * 1000);
 		sem_wait(data->meal_sem);
 		philo->meals_eaten++;
+		sem_wait(data->meal_count_sem);
 		if (philo->meals_eaten >= data->must_eat_count
-			&& philo->has_finished == false)
+			&& !philo->has_finished_meals)
 		{
-			sem_wait(data->meal_count_sem);
+			philo->has_finished_meals = true;
 			data->meals_finished++;
-			sem_post(data->meal_count_sem);
+			philo->data->meal_count_sem->__align++;
 		}
+		sem_post(data->meal_count_sem);
 		sem_post(data->meal_sem);
 		sem_post(data->forks);
 		sem_post(data->forks);

@@ -6,7 +6,7 @@
 /*   By: sodahani <sodahani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:35:01 by sodahani          #+#    #+#             */
-/*   Updated: 2025/02/11 19:12:13 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/11 21:59:40 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ typedef struct s_philo
 {
 	int					id;
 	unsigned int		meals_eaten;
-	bool				has_finished;
+	bool				has_finished_meals;
 	struct timeval		last_meal_time;
 	pid_t				pid;
 	t_data				*data;
@@ -50,6 +50,7 @@ typedef struct s_philo
 typedef struct s_data
 {
 	unsigned int		num_philos;
+	bool				finished_flag;
 	int					time_to_die;
 	int					time_to_eat;
 	int					time_to_sleep;

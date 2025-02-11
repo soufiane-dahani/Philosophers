@@ -6,7 +6,7 @@
 /*   By: sodahani <sodahani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:34:41 by sodahani          #+#    #+#             */
-/*   Updated: 2025/02/11 21:17:24 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/11 22:40:32 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,6 +109,22 @@ static int	check_philosopher_death(t_philo *philo, struct timeval current_time)
 		terminate_processes(philo->data);
 		return (1);
 	}
+	if (philo->data->num_philos + 1 == philo->data->meal_count_sem->__align)
+	{
+		sem_wait(philo->data->death_sem);
+		if (philo->data->is_dead == 0
+			&& philo->data->death_sem->__align != 1337)
+		{
+			philo->data->is_dead = 1;
+			philo->data->death_sem->__align = 1337;
+			sem_wait(philo->data->print_sem);
+			printf("all philosophers have finished their meals\n");
+			sem_post(philo->data->print_sem);
+		}
+		sem_post(philo->data->death_sem);
+		terminate_processes(philo->data);
+		return (1);
+	}
 	return (0);
 }
 
@@ -126,7 +142,7 @@ void	*monitor_death(void *arg)
 			terminate_processes(philo->data);
 			break ;
 		}
-		usleep(1000);
+		usleep(100);
 	}
 	return (NULL);
 }

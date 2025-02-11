@@ -6,7 +6,7 @@
 /*   By: sodahani <sodahani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:34:41 by sodahani          #+#    #+#             */
-/*   Updated: 2025/02/11 18:48:26 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/11 22:19:19 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ static void	init_philosophers(t_data *data)
 		data->philos[i].meals_eaten = 0;
 		data->philos[i].last_meal_time = get_current_time();
 		data->philos[i].data = data;
-		data->philos[i].has_finished = false;
+		data->philos[i].has_finished_meals = false;
 		i++;
 	}
 }
@@ -85,6 +85,7 @@ t_data	*initialize_data(t_init init)
 	data->time_to_sleep = init.time_to_sleep;
 	data->must_eat_count = init.must_eat_count;
 	data->is_dead = 0;
+	data->finished_flag = false;
 	data->philos = malloc(sizeof(t_philo) * init.num_philos);
 	if (!data->philos)
 		return (free(data), NULL);
