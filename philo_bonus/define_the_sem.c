@@ -6,7 +6,7 @@
 /*   By: sodahani <sodahani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:34:41 by sodahani          #+#    #+#             */
-/*   Updated: 2025/02/11 15:16:49 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/11 15:32:17 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,8 @@ static void	wait_and_sem_close(t_data *data)
 
 int	start_simulation(t_data *data)
 {
-	size_t	i;
+	size_t		i;
+	pthread_t	monitor_thread;
 
 	i = 0;
 	while (i < data->num_philos)
@@ -68,20 +69,23 @@ int	start_simulation(t_data *data)
 		}
 		i++;
 	}
+	if (pthread_create(&monitor_thread, NULL, monitor_philosophers, data) != 0)
+	{
+		write(2, "Error: Failed to create monitor thread\n", 40);
+		terminate_processes(data);
+		return (1);
+	}
+	pthread_join(monitor_thread, NULL);
 	wait_and_sem_close(data);
 	return (0);
 }
-
 void	*monitor_philosophers(void *arg)
 {
 	struct timeval	current_time;
-	long long		last_meal_time_ms;
-	long long		current_time_ms;
-	long long		timestamp;
-	unsigned int	i;
-	unsigned int	finished_meals;
 	t_data			*data;
 
+	long long last_meal_time_ms, current_time_ms, timestamp;
+	unsigned int i, finished_meals;
 	data = (t_data *)arg;
 	while (1)
 	{
@@ -93,26 +97,25 @@ void	*monitor_philosophers(void *arg)
 			sem_wait(data->meal_sem);
 			last_meal_time_ms = (data->philos[i].last_meal_time.tv_sec * 1000)
 				+ (data->philos[i].last_meal_time.tv_usec / 1000);
+			sem_post(data->meal_sem);
 			current_time_ms = (current_time.tv_sec * 1000)
 				+ (current_time.tv_usec / 1000);
-			sem_post(data->meal_sem);
 			timestamp = ((current_time.tv_sec * 1000) + (current_time.tv_usec
 						/ 1000)) - ((data->start_time.tv_sec * 1000)
 					+ (data->start_time.tv_usec / 1000));
-			if ((current_time_ms - last_meal_time_ms) >= data->time_to_die)
+			sem_wait(data->death_sem);
+			if ((current_time_ms - last_meal_time_ms) >= data->time_to_die
+				&& data->is_dead == 0)
 			{
-				sem_wait(data->death_sem);
-				if (data->is_dead == 0)
-				{
-					data->is_dead = 1;
-					sem_wait(data->print_sem);
-					printf("%lld %d died\n", timestamp, data->philos[i].id);
-					sem_post(data->print_sem);
-				}
+				data->is_dead = 1;
+				sem_wait(data->print_sem);
+				printf("%lld %d died\n", timestamp, data->philos[i].id);
+				sem_post(data->print_sem);
 				sem_post(data->death_sem);
 				terminate_processes(data);
 				exit(1);
 			}
+			sem_post(data->death_sem);
 			sem_wait(data->meal_sem);
 			if (data->philos[i].meals_eaten >= data->must_eat_count)
 				finished_meals++;
@@ -130,6 +133,6 @@ void	*monitor_philosophers(void *arg)
 			terminate_processes(data);
 			exit(0);
 		}
-		usleep(5000);
+		usleep(1000);
 	}
 }

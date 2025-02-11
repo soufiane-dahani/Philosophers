@@ -6,7 +6,7 @@
 /*   By: sodahani <sodahani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:34:41 by sodahani          #+#    #+#             */
-/*   Updated: 2025/02/11 15:16:00 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/11 15:31:45 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,34 +15,21 @@
 void	philosopher_lifecycle(t_philo *philo)
 {
 	t_data	*data;
-		pthread_t monitor;
 
 	data = philo->data;
 	while (!check_if_dead(philo))
 	{
-		if (pthread_create(&monitor, NULL, monitor_philosophers, data) != 0)
-		{
-			write(2, "Error: Failed to create monitor thread\n", 40);
-				return ;
-		}
 		print_status(philo, "is thinking");
 		if (philo->id % 2 == 0)
 			usleep(500);
-		if (philo->id % 2 == 0)
-		{
-			sem_wait(data->forks);
-			sem_wait(data->forks);
-		}
-		else
-		{
-			usleep(100);
-			sem_wait(data->forks);
-			sem_wait(data->forks);
-		}
+		sem_wait(data->forks);
+		sem_wait(data->forks);
+		sem_wait(data->meal_sem);
+		philo->last_meal_time = get_current_time();
+		sem_post(data->meal_sem);
 		print_status(philo, "is eating");
 		usleep(data->time_to_eat * 1000);
 		sem_wait(data->meal_sem);
-		philo->last_meal_time = get_current_time();
 		philo->meals_eaten++;
 		sem_post(data->meal_sem);
 		sem_post(data->forks);
