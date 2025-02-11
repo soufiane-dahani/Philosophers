@@ -6,7 +6,7 @@
 /*   By: sodahani <sodahani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:35:01 by sodahani          #+#    #+#             */
-/*   Updated: 2025/02/11 16:13:11 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/11 19:12:13 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ typedef struct s_philo
 {
 	int					id;
 	unsigned int		meals_eaten;
-	bool				has_fork;
+	bool				has_finished;
 	struct timeval		last_meal_time;
 	pid_t				pid;
 	t_data				*data;
@@ -89,6 +89,6 @@ void					cleanup_sems(t_data *data);
 void					print_status(t_philo *philo, const char *status);
 
 int						check_if_dead(t_philo *philo);
-void					*monitor_philosophers(void *arg);
+void					*monitor_death(void *arg);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: sodahani <sodahani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:34:41 by sodahani          #+#    #+#             */
-/*   Updated: 2025/02/11 17:53:25 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/11 21:14:54 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,18 +18,21 @@ void	philosopher_lifecycle(t_philo *philo)
 	pthread_t	monitor_thread;
 
 	data = philo->data;
-	if (pthread_create(&monitor_thread, NULL, monitor_philosophers, philo) != 0)
+	if (pthread_create(&monitor_thread, NULL, monitor_death, philo) != 0)
 	{
 		write(2, "Error: Failed to create monitor thread\n", 40);
 		return ;
 	}
 	while (!check_if_dead(philo))
 	{
+		if (data->death_sem->__align != 1)
+			return ;
 		print_status(philo, "is thinking");
 		if (philo->id % 2 == 0)
 			usleep(1000);
 		sem_wait(data->forks);
 		sem_wait(data->forks);
+		print_status(philo, "has taken a fork");
 		sem_wait(data->last_meal_sem);
 		philo->last_meal_time = get_current_time();
 		sem_post(data->last_meal_sem);
@@ -37,7 +40,8 @@ void	philosopher_lifecycle(t_philo *philo)
 		usleep(data->time_to_eat * 1000);
 		sem_wait(data->meal_sem);
 		philo->meals_eaten++;
-		if (philo->meals_eaten >= data->must_eat_count)
+		if (philo->meals_eaten >= data->must_eat_count
+			&& philo->has_finished == false)
 		{
 			sem_wait(data->meal_count_sem);
 			data->meals_finished++;
@@ -58,6 +62,8 @@ void	print_status(t_philo *philo, const char *status)
 	long long		timestamp;
 
 	if (check_if_dead(philo))
+		return ;
+	if (philo->data->death_sem->__align != 1)
 		return ;
 	gettimeofday(&current_time, NULL);
 	timestamp = ((current_time.tv_sec * 1000) + (current_time.tv_usec / 1000))

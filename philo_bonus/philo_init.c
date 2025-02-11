@@ -6,7 +6,7 @@
 /*   By: sodahani <sodahani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:34:41 by sodahani          #+#    #+#             */
-/*   Updated: 2025/02/11 16:15:34 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/11 18:48:26 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,7 @@ static void	init_philosophers(t_data *data)
 		data->philos[i].meals_eaten = 0;
 		data->philos[i].last_meal_time = get_current_time();
 		data->philos[i].data = data;
+		data->philos[i].has_finished = false;
 		i++;
 	}
 }
