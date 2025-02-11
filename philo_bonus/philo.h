@@ -6,7 +6,7 @@
 /*   By: sodahani <sodahani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:35:01 by sodahani          #+#    #+#             */
-/*   Updated: 2025/02/11 15:16:58 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/11 16:13:11 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,12 +54,15 @@ typedef struct s_data
 	int					time_to_eat;
 	int					time_to_sleep;
 	unsigned int		must_eat_count;
+	unsigned int		meals_finished;
 	struct timeval		start_time;
 	int					is_dead;
 	sem_t				*forks;
 	sem_t				*meal_sem;
 	sem_t				*print_sem;
 	sem_t				*death_sem;
+	sem_t				*last_meal_sem;
+	sem_t				*meal_count_sem;
 	t_philo				*philos;
 }						t_data;
 
