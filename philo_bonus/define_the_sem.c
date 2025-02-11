@@ -6,7 +6,7 @@
 /*   By: sodahani <sodahani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:34:41 by sodahani          #+#    #+#             */
-/*   Updated: 2025/02/10 12:43:25 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/11 15:16:49 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,8 +23,6 @@ static void	terminate_processes(t_data *data)
 			kill(data->philos[i].pid, SIGKILL);
 		i++;
 	}
-	if (data->monitor_pid > 0)
-		kill(data->monitor_pid, SIGKILL);
 }
 
 static void	wait_and_sem_close(t_data *data)
@@ -38,8 +36,6 @@ static void	wait_and_sem_close(t_data *data)
 		if (WIFEXITED(status) || WIFSIGNALED(status))
 			continue ;
 	}
-	if (data->monitor_pid > 0)
-		waitpid(data->monitor_pid, NULL, 0);
 	terminate_processes(data);
 	sem_close(data->forks);
 	sem_close(data->print_sem);
@@ -72,23 +68,11 @@ int	start_simulation(t_data *data)
 		}
 		i++;
 	}
-	data->monitor_pid = fork();
-	if (data->monitor_pid < 0)
-	{
-		write(2, "Error: fork failed\n", 20);
-		terminate_processes(data);
-		return (1);
-	}
-	if (data->monitor_pid == 0)
-	{
-		monitor_philosophers(data);
-		exit(0);
-	}
 	wait_and_sem_close(data);
 	return (0);
 }
 
-void	monitor_philosophers(t_data *data)
+void	*monitor_philosophers(void *arg)
 {
 	struct timeval	current_time;
 	long long		last_meal_time_ms;
@@ -96,7 +80,9 @@ void	monitor_philosophers(t_data *data)
 	long long		timestamp;
 	unsigned int	i;
 	unsigned int	finished_meals;
+	t_data			*data;
 
+	data = (t_data *)arg;
 	while (1)
 	{
 		i = 0;

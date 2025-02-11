@@ -6,7 +6,7 @@
 /*   By: sodahani <sodahani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:35:01 by sodahani          #+#    #+#             */
-/*   Updated: 2025/02/10 11:04:01 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/11 15:16:58 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,6 @@ typedef struct s_data
 	sem_t				*meal_sem;
 	sem_t				*print_sem;
 	sem_t				*death_sem;
-	pid_t				monitor_pid;
 	t_philo				*philos;
 }						t_data;
 
@@ -87,6 +86,6 @@ void					cleanup_sems(t_data *data);
 void					print_status(t_philo *philo, const char *status);
 
 int						check_if_dead(t_philo *philo);
-void					monitor_philosophers(t_data *data);
+void					*monitor_philosophers(void *arg);
 
 #endif
