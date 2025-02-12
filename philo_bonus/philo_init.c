@@ -6,7 +6,7 @@
 /*   By: sodahani <sodahani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:34:41 by sodahani          #+#    #+#             */
-/*   Updated: 2025/02/11 22:19:19 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/12 16:51:44 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,10 @@ static int	init_global_sems(t_data *data)
 	sem_unlink("/death_sem");
 	sem_unlink("/last_meal");
 	sem_unlink("/meal_count");
+	sem_unlink("/d");
+	sem_unlink("/m");
+	data->d = sem_open("/d", O_CREAT | O_EXCL, 0644, 1);
+	data->m = sem_open("/m", O_CREAT | O_EXCL, 0644, 1);
 	data->print_sem = sem_open("/print", O_CREAT | O_EXCL, 0644, 1);
 	data->meal_sem = sem_open("/meal_check", O_CREAT | O_EXCL, 0644, 1);
 	data->death_sem = sem_open("/death_sem", O_CREAT | O_EXCL, 0644, 1);
@@ -38,11 +42,14 @@ static int	init_global_sems(t_data *data)
 	data->meal_count_sem = sem_open("/meal_count", O_CREAT, 0644, 1);
 	if (data->print_sem == SEM_FAILED || data->meal_sem == SEM_FAILED
 		|| data->death_sem == SEM_FAILED || data->last_meal_sem == SEM_FAILED
-		|| data->meal_count_sem == SEM_FAILED)
+		|| data->meal_count_sem == SEM_FAILED || data->d == SEM_FAILED
+		|| data->m == SEM_FAILED)
 	{
 		write(2, "Error: sem_open failed\n", 23);
 		return (1);
 	}
+	data->d->__align = 0;
+	data->m->__align = 0;
 	return (0);
 }
 

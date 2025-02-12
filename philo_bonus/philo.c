@@ -6,7 +6,7 @@
 /*   By: sodahani <sodahani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:34:41 by sodahani          #+#    #+#             */
-/*   Updated: 2025/02/09 22:36:10 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/12 16:18:09 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,6 @@ struct timeval	get_current_time(void)
 	gettimeofday(&tv, NULL);
 	return (tv);
 }
-
 int	main(int ac, char const **av)
 {
 	int		*num;
@@ -82,18 +81,27 @@ int	main(int ac, char const **av)
 		printf("0 1 is thinking\n");
 		usleep(data->time_to_die * 1000);
 		printf("%d 1 died\n", data->time_to_die);
+		cleanup_sems(data);
 		free(data);
 		return (0);
 	}
 	if (data->must_eat_count == 0)
 	{
 		printf("all philosophers have finished their meals\n");
+		cleanup_sems(data);
 		free(data);
 		return (0);
 	}
-	start_simulation(data);
+	if (start_simulation(data) != 0)
+	{
+		cleanup_sems(data);
+		free(data->philos);
+		free(data);
+		return (1);
+	}
+	cleanup_sems(data);
 	free(data->philos);
 	free(data);
-	cleanup_sems(data);
+	terminate_processes(data);
 	return (0);
 }

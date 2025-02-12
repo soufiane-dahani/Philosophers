@@ -6,13 +6,13 @@
 /*   By: sodahani <sodahani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:34:41 by sodahani          #+#    #+#             */
-/*   Updated: 2025/02/11 22:40:32 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/12 16:58:44 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-static void	terminate_processes(t_data *data)
+void	terminate_processes(t_data *data)
 {
 	size_t	i;
 
@@ -23,6 +23,23 @@ static void	terminate_processes(t_data *data)
 			kill(data->philos[i].pid, SIGKILL);
 		i++;
 	}
+	sem_close(data->forks);
+	sem_close(data->print_sem);
+	sem_close(data->meal_sem);
+	sem_close(data->death_sem);
+	sem_close(data->last_meal_sem);
+	sem_close(data->meal_count_sem);
+	sem_close(data->d);
+	sem_close(data->m);
+	sem_unlink("/d");
+	sem_unlink("/m");
+	sem_unlink("/forks");
+	sem_unlink("/print");
+	sem_unlink("/meal_check");
+	sem_unlink("/death_sem");
+	sem_unlink("/last_meal");
+	sem_unlink("/meal_count");
+	free(data->philos);
 	exit(1);
 }
 
@@ -38,18 +55,6 @@ static void	wait_and_sem_close(t_data *data)
 			continue ;
 	}
 	terminate_processes(data);
-	sem_close(data->forks);
-	sem_close(data->print_sem);
-	sem_close(data->meal_sem);
-	sem_close(data->death_sem);
-	sem_close(data->last_meal_sem);
-	sem_close(data->meal_count_sem);
-	sem_unlink("/forks");
-	sem_unlink("/print");
-	sem_unlink("/meal_check");
-	sem_unlink("/death_sem");
-	sem_unlink("/last_meal");
-	sem_unlink("/meal_count");
 }
 
 int	start_simulation(t_data *data)
@@ -76,7 +81,6 @@ int	start_simulation(t_data *data)
 	wait_and_sem_close(data);
 	return (0);
 }
-
 static int	check_philosopher_death(t_philo *philo, struct timeval current_time)
 {
 	long long	last_meal_time_ms;
@@ -86,45 +90,39 @@ static int	check_philosopher_death(t_philo *philo, struct timeval current_time)
 	sem_wait(philo->data->meal_sem);
 	last_meal_time_ms = (philo->last_meal_time.tv_sec * 1000)
 		+ (philo->last_meal_time.tv_usec / 1000);
+	sem_post(philo->data->meal_sem);
 	current_time_ms = (current_time.tv_sec * 1000) + (current_time.tv_usec
 			/ 1000);
-	sem_post(philo->data->meal_sem);
 	if ((current_time_ms - last_meal_time_ms) >= philo->data->time_to_die)
 	{
 		sem_wait(philo->data->death_sem);
-		if (philo->data->is_dead == 0
-			&& philo->data->death_sem->__align != 1337)
+		if (!philo->data->is_dead && philo->data->d->__align == 0)
 		{
 			philo->data->is_dead = 1;
-			philo->data->death_sem->__align = 1337;
+			philo->data->d->__align = 1;
 			gettimeofday(&current_time, NULL);
 			timestamp = ((current_time.tv_sec * 1000) + (current_time.tv_usec
-						/ 1000)) - ((philo->data->start_time.tv_sec * 1000)
-					+ (philo->data->start_time.tv_usec / 1000));
+						/ 1000)) -
+				((philo->data->start_time.tv_sec * 1000)
+						+ (philo->data->start_time.tv_usec / 1000));
 			sem_wait(philo->data->print_sem);
-			printf("%lld %d %s\n", timestamp, philo->id, "died");
+			printf("%lld %d died\n", timestamp, philo->id);
+			terminate_processes(philo->data);
 			sem_post(philo->data->print_sem);
 		}
 		sem_post(philo->data->death_sem);
-		terminate_processes(philo->data);
 		return (1);
 	}
-	if (philo->data->num_philos + 1 == philo->data->meal_count_sem->__align)
+	sem_wait(philo->data->meal_count_sem);
+	if (philo->data->m->__align == philo->data->num_philos)
 	{
-		sem_wait(philo->data->death_sem);
-		if (philo->data->is_dead == 0
-			&& philo->data->death_sem->__align != 1337)
-		{
-			philo->data->is_dead = 1;
-			philo->data->death_sem->__align = 1337;
-			sem_wait(philo->data->print_sem);
-			printf("all philosophers have finished their meals\n");
-			sem_post(philo->data->print_sem);
-		}
-		sem_post(philo->data->death_sem);
+		philo->data->m->__align++;
+		printf("all philosophers have finished their meals\n");
+		sem_post(philo->data->meal_count_sem);
 		terminate_processes(philo->data);
 		return (1);
 	}
+	sem_post(philo->data->meal_count_sem);
 	return (0);
 }
 
@@ -138,11 +136,8 @@ void	*monitor_death(void *arg)
 	{
 		gettimeofday(&current_time, NULL);
 		if (check_philosopher_death(philo, current_time))
-		{
-			terminate_processes(philo->data);
 			break ;
-		}
-		usleep(100);
+		usleep(1000);
 	}
 	return (NULL);
 }

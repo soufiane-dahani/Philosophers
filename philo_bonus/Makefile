@@ -4,7 +4,7 @@ OBJS = ${SRCS:.c=.o}
 NAME = philo_bonus
 CC = cc
 RM = rm -f
-CFLAGS = -Wall -Wextra -Werror 
+CFLAGS = -Wall -Wextra -Werror #-fsanitize=undefined -fsanitize=thread
 ${NAME}: ${OBJS}
 	$(CC) $(CFLAGS) ${OBJS} -o ${NAME}
  
