@@ -6,7 +6,7 @@
 /*   By: sodahani <sodahani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:34:41 by sodahani          #+#    #+#             */
-/*   Updated: 2025/02/13 14:51:33 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/13 15:14:02 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,25 +15,15 @@
 void	pick_forks(t_philo *philo)
 {
 	if (philo->id % 2 != 0)
-		usleep(2000);
+		usleep(50);
 	sem_wait(philo->data->forks);
 	sem_wait(philo->data->forks);
 }
 
 void	release_forks(t_philo *philo)
 {
-	if (philo->id % 2 != 0)
-		usleep(100);
-	if (philo->id % 2 == 0)
-	{
-		sem_post(philo->data->forks);
-		sem_post(philo->data->forks);
-	}
-	else
-	{
-		sem_post(philo->data->forks);
-		sem_post(philo->data->forks);
-	}
+	sem_post(philo->data->forks);
+	sem_post(philo->data->forks);
 }
 
 void	philosopher_lifecycle(t_philo *philo)
@@ -53,19 +43,15 @@ void	philosopher_lifecycle(t_philo *philo)
 			break;
 		print_status(philo, "is thinking");
 		pick_forks(philo);
-		sem_wait(data->meal_sem);
 		philo->last_meal_time = get_current_time();
-		sem_post(data->meal_sem);
 		print_status(philo, "has taken a fork");
 		print_status(philo, "is eating");
-		sem_wait(data->meal_sem);
 		philo->meals_eaten++;
 		if (philo->meals_eaten >= data->must_eat_count && !philo->has_finished_meals)
 		{
 			philo->has_finished_meals = true;
 			data->m->__align++;
 		}
-		sem_post(data->meal_sem);
 		usleep(data->time_to_eat * 1000);
 		release_forks(philo);
 		if (check_if_dead(philo))
@@ -80,15 +66,18 @@ void	print_status(t_philo *philo, const char *status)
 	struct timeval	current_time;
 	long long		timestamp;
 
-	if (philo->data->death_sem->__align != 1)
-		return ;
 	gettimeofday(&current_time, NULL);
-	timestamp = ((current_time.tv_sec * 1000) + (current_time.tv_usec / 1000)) -
-		((philo->data->start_time.tv_sec * 1000)
-				+ (philo->data->start_time.tv_usec / 1000));
-	sem_wait(philo->data->print_sem);
-	printf("%lld %d %s\n", timestamp, philo->id, status);
-	sem_post(philo->data->print_sem);
+	timestamp = ((current_time.tv_sec * 1000) + (current_time.tv_usec / 1000))
+		- ((philo->data->start_time.tv_sec * 1000)
+			+ (philo->data->start_time.tv_usec / 1000));
+	if (check_if_dead(philo))
+		return ;
+	if (!check_if_dead(philo))
+	{
+		sem_wait(philo->data->print_sem);
+		printf("%lld %d %s\n", timestamp, philo->id, status);
+		sem_post(philo->data->print_sem);
+	}
 }
 
 int	check_if_dead(t_philo *philo)
