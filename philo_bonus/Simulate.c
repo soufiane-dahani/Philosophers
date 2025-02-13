@@ -6,7 +6,7 @@
 /*   By: sodahani <sodahani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:34:41 by sodahani          #+#    #+#             */
-/*   Updated: 2025/02/13 15:28:56 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/13 22:15:05 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,8 @@
 
 void	pick_forks(t_philo *philo)
 {
-	if (philo->id % 2 != 0)
-		usleep(50);
+	if (philo->id % 2 == 0)
+		usleep(2000);
 	sem_wait(philo->data->forks);
 	sem_wait(philo->data->forks);
 }
@@ -43,9 +43,10 @@ void	philosopher_lifecycle(t_philo *philo)
 			break ;
 		print_status(philo, "is thinking");
 		pick_forks(philo);
-		philo->last_meal_time = get_current_time();
 		print_status(philo, "has taken a fork");
+		philo->last_meal_time = get_current_time();
 		print_status(philo, "is eating");
+		usleep(data->time_to_eat * 1000);
 		philo->meals_eaten++;
 		if (philo->meals_eaten >= data->must_eat_count
 			&& !philo->has_finished_meals)
@@ -53,12 +54,12 @@ void	philosopher_lifecycle(t_philo *philo)
 			philo->has_finished_meals = true;
 			data->m->__align++;
 		}
-		usleep(data->time_to_eat * 1000);
 		release_forks(philo);
 		if (check_if_dead(philo))
 			break ;
 		print_status(philo, "is sleeping");
 		usleep(data->time_to_sleep * 1000);
+		usleep(500);
 	}
 }
 
