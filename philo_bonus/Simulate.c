@@ -6,11 +6,35 @@
 /*   By: sodahani <sodahani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:34:41 by sodahani          #+#    #+#             */
-/*   Updated: 2025/02/12 16:52:47 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/13 14:51:33 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
+
+void	pick_forks(t_philo *philo)
+{
+	if (philo->id % 2 != 0)
+		usleep(2000);
+	sem_wait(philo->data->forks);
+	sem_wait(philo->data->forks);
+}
+
+void	release_forks(t_philo *philo)
+{
+	if (philo->id % 2 != 0)
+		usleep(100);
+	if (philo->id % 2 == 0)
+	{
+		sem_post(philo->data->forks);
+		sem_post(philo->data->forks);
+	}
+	else
+	{
+		sem_post(philo->data->forks);
+		sem_post(philo->data->forks);
+	}
+}
 
 void	philosopher_lifecycle(t_philo *philo)
 {
@@ -23,33 +47,29 @@ void	philosopher_lifecycle(t_philo *philo)
 		write(2, "Error: Failed to create monitor thread\n", 40);
 	}
 	pthread_detach(monitor_thread);
-	while (philo->data->death_sem->__align == 1)
+	while (1)
 	{
+		if (check_if_dead(philo))
+			break;
 		print_status(philo, "is thinking");
-		if (philo->id % 2 == 0)
-			usleep(1000);
-		sem_wait(data->forks);
-		print_status(philo, "has taken a fork");
-		sem_wait(data->forks);
-		print_status(philo, "has taken a fork");
-		sem_wait(data->last_meal_sem);
+		pick_forks(philo);
+		sem_wait(data->meal_sem);
 		philo->last_meal_time = get_current_time();
-		sem_post(data->last_meal_sem);
+		sem_post(data->meal_sem);
+		print_status(philo, "has taken a fork");
 		print_status(philo, "is eating");
-		usleep(data->time_to_eat * 1000);
 		sem_wait(data->meal_sem);
 		philo->meals_eaten++;
-		if (philo->meals_eaten >= data->must_eat_count
-			&& !philo->has_finished_meals)
+		if (philo->meals_eaten >= data->must_eat_count && !philo->has_finished_meals)
 		{
 			philo->has_finished_meals = true;
-			sem_wait(data->meal_count_sem);
 			data->m->__align++;
-			sem_post(data->meal_count_sem);
 		}
 		sem_post(data->meal_sem);
-		sem_post(data->forks);
-		sem_post(data->forks);
+		usleep(data->time_to_eat * 1000);
+		release_forks(philo);
+		if (check_if_dead(philo))
+			break;
 		print_status(philo, "is sleeping");
 		usleep(data->time_to_sleep * 1000);
 	}
@@ -76,7 +96,7 @@ int	check_if_dead(t_philo *philo)
 	int	is_dead;
 
 	sem_wait(philo->data->death_sem);
-	is_dead = philo->data->is_dead;
+	is_dead = philo->data->d->__align;
 	sem_post(philo->data->death_sem);
 	return (is_dead);
 }
