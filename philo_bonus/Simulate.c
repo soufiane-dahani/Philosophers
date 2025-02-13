@@ -6,7 +6,7 @@
 /*   By: sodahani <sodahani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:34:41 by sodahani          #+#    #+#             */
-/*   Updated: 2025/02/13 22:15:05 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/13 23:48:39 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,9 @@ void	philosopher_lifecycle(t_philo *philo)
 		print_status(philo, "is thinking");
 		pick_forks(philo);
 		print_status(philo, "has taken a fork");
+		sem_wait(data->meal_sem);
 		philo->last_meal_time = get_current_time();
+		sem_post(data->meal_sem);
 		print_status(philo, "is eating");
 		usleep(data->time_to_eat * 1000);
 		philo->meals_eaten++;
@@ -52,7 +54,9 @@ void	philosopher_lifecycle(t_philo *philo)
 			&& !philo->has_finished_meals)
 		{
 			philo->has_finished_meals = true;
+			sem_wait(data->meal_sem);
 			data->m->__align++;
+			sem_post(data->meal_sem);
 		}
 		release_forks(philo);
 		if (check_if_dead(philo))
