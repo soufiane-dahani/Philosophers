@@ -6,7 +6,7 @@
 /*   By: sodahani <sodahani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:34:41 by sodahani          #+#    #+#             */
-/*   Updated: 2025/02/13 15:14:02 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/13 15:28:56 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,14 +40,15 @@ void	philosopher_lifecycle(t_philo *philo)
 	while (1)
 	{
 		if (check_if_dead(philo))
-			break;
+			break ;
 		print_status(philo, "is thinking");
 		pick_forks(philo);
 		philo->last_meal_time = get_current_time();
 		print_status(philo, "has taken a fork");
 		print_status(philo, "is eating");
 		philo->meals_eaten++;
-		if (philo->meals_eaten >= data->must_eat_count && !philo->has_finished_meals)
+		if (philo->meals_eaten >= data->must_eat_count
+			&& !philo->has_finished_meals)
 		{
 			philo->has_finished_meals = true;
 			data->m->__align++;
@@ -55,7 +56,7 @@ void	philosopher_lifecycle(t_philo *philo)
 		usleep(data->time_to_eat * 1000);
 		release_forks(philo);
 		if (check_if_dead(philo))
-			break;
+			break ;
 		print_status(philo, "is sleeping");
 		usleep(data->time_to_sleep * 1000);
 	}
@@ -70,8 +71,6 @@ void	print_status(t_philo *philo, const char *status)
 	timestamp = ((current_time.tv_sec * 1000) + (current_time.tv_usec / 1000))
 		- ((philo->data->start_time.tv_sec * 1000)
 			+ (philo->data->start_time.tv_usec / 1000));
-	if (check_if_dead(philo))
-		return ;
 	if (!check_if_dead(philo))
 	{
 		sem_wait(philo->data->print_sem);
@@ -96,8 +95,6 @@ void	cleanup_sems(t_data *data)
 	sem_close(data->print_sem);
 	sem_close(data->meal_sem);
 	sem_close(data->death_sem);
-	sem_close(data->last_meal_sem);
-	sem_close(data->meal_count_sem);
 	sem_unlink("/forks");
 	sem_unlink("/print");
 	sem_unlink("/meal_check");

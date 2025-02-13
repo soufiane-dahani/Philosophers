@@ -6,7 +6,7 @@
 /*   By: sodahani <sodahani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:34:41 by sodahani          #+#    #+#             */
-/*   Updated: 2025/02/13 15:15:26 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/13 15:28:46 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,8 +27,6 @@ void	terminate_processes(t_data *data)
 	sem_close(data->print_sem);
 	sem_close(data->meal_sem);
 	sem_close(data->death_sem);
-	sem_close(data->last_meal_sem);
-	sem_close(data->meal_count_sem);
 	sem_close(data->d);
 	sem_close(data->m);
 	sem_unlink("/d");
@@ -109,7 +107,8 @@ static int	check_philosopher_death(t_philo *philo, struct timeval current_time)
 		+ (philo->last_meal_time.tv_usec / 1000);
 	current_time_ms = (current_time.tv_sec * 1000) + (current_time.tv_usec
 			/ 1000);
-	if ((current_time_ms - last_meal_time_ms) >= philo->data->time_to_die && philo->data->d->__align != 1)
+	if ((current_time_ms - last_meal_time_ms) >= philo->data->time_to_die
+		&& philo->data->d->__align != 1)
 	{
 		philo->data->d->__align = 1;
 		gettimeofday(&current_time, NULL);
@@ -134,10 +133,10 @@ void	*monitor_death(void *arg)
 	while (1)
 	{
 		if (check_meals(philo))
-			break;
+			break ;
 		gettimeofday(&current_time, NULL);
 		if (check_philosopher_death(philo, current_time))
-			break;
+			break ;
 		if (philo->data->num_philos % 2 != 0)
 			usleep(200);
 	}

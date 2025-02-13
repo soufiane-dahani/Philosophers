@@ -6,7 +6,7 @@
 /*   By: sodahani <sodahani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:34:41 by sodahani          #+#    #+#             */
-/*   Updated: 2025/02/12 16:51:44 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/13 15:30:12 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,11 +38,8 @@ static int	init_global_sems(t_data *data)
 	data->print_sem = sem_open("/print", O_CREAT | O_EXCL, 0644, 1);
 	data->meal_sem = sem_open("/meal_check", O_CREAT | O_EXCL, 0644, 1);
 	data->death_sem = sem_open("/death_sem", O_CREAT | O_EXCL, 0644, 1);
-	data->last_meal_sem = sem_open("/last_meal", O_CREAT, 0644, 1);
-	data->meal_count_sem = sem_open("/meal_count", O_CREAT, 0644, 1);
 	if (data->print_sem == SEM_FAILED || data->meal_sem == SEM_FAILED
-		|| data->death_sem == SEM_FAILED || data->last_meal_sem == SEM_FAILED
-		|| data->meal_count_sem == SEM_FAILED || data->d == SEM_FAILED
+		|| data->death_sem == SEM_FAILED || data->d == SEM_FAILED
 		|| data->m == SEM_FAILED)
 	{
 		write(2, "Error: sem_open failed\n", 23);
@@ -92,7 +89,6 @@ t_data	*initialize_data(t_init init)
 	data->time_to_sleep = init.time_to_sleep;
 	data->must_eat_count = init.must_eat_count;
 	data->is_dead = 0;
-	data->finished_flag = false;
 	data->philos = malloc(sizeof(t_philo) * init.num_philos);
 	if (!data->philos)
 		return (free(data), NULL);

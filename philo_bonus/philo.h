@@ -6,7 +6,7 @@
 /*   By: sodahani <sodahani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:35:01 by sodahani          #+#    #+#             */
-/*   Updated: 2025/02/12 16:47:46 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/13 15:29:45 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,6 @@ typedef struct s_philo
 typedef struct s_data
 {
 	unsigned int		num_philos;
-	bool				finished_flag;
 	int					time_to_die;
 	int					time_to_eat;
 	int					time_to_sleep;
@@ -62,8 +61,6 @@ typedef struct s_data
 	sem_t				*meal_sem;
 	sem_t				*print_sem;
 	sem_t				*death_sem;
-	sem_t				*last_meal_sem;
-	sem_t				*meal_count_sem;
 	sem_t				*d;
 	sem_t				*m;
 	t_philo				*philos;
