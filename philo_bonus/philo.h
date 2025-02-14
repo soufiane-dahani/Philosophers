@@ -6,7 +6,7 @@
 /*   By: sodahani <sodahani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:35:01 by sodahani          #+#    #+#             */
-/*   Updated: 2025/02/14 16:18:12 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/14 18:47:26 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,5 +95,23 @@ void					*monitor_death(void *arg);
 void					terminate_processes(t_data *data);
 
 void					cleanup_all(t_data *data);
+
+int						handle_single_philosopher(t_data *data);
+
+int						handle_meal_completion(t_data *data);
+
+int						initialize_simulation(int ac, char const **av,
+							t_data **data);
+void					cleanup_all(t_data *data);
+void					wait_and_sem_close(t_data *data);
+
+void					terminate_processes(t_data *data);
+
+int						start_simulation(t_data *data);
+
+int						validate_args(int ac, char const **av, int *capacity,
+							int **num);
+
+t_data					*setup_data(int *num, int capacity);
 
 #endif

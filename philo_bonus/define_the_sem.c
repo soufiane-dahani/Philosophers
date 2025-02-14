@@ -6,70 +6,12 @@
 /*   By: sodahani <sodahani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:34:41 by sodahani          #+#    #+#             */
-/*   Updated: 2025/02/14 18:17:23 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/14 18:43:05 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-void	terminate_processes(t_data *data)
-{
-	size_t	i;
-
-	if (!data)
-		return ;
-	if (!data->philos)
-		return ;
-	i = 0;
-	while (i < data->num_philos)
-	{
-		if (data->philos[i].pid > 0)
-			kill(data->philos[i].pid, SIGKILL);
-		i++;
-	}
-	cleanup_all(data);
-	exit(0);
-}
-
-static void	wait_and_sem_close(t_data *data)
-{
-	int		status;
-	pid_t	pid;
-
-	while ((pid = waitpid(-1, &status, 0)) > 0)
-	{
-		if (WIFEXITED(status) || WIFSIGNALED(status))
-			continue ;
-	}
-	while (wait(NULL) > 0)
-		;
-	terminate_processes(data);
-}
-
-int	start_simulation(t_data *data)
-{
-	size_t	i;
-
-	i = 0;
-	while (i < data->num_philos)
-	{
-		data->philos[i].pid = fork();
-		if (data->philos[i].pid < 0)
-		{
-			write(2, "Error: fork failed\n", 20);
-			terminate_processes(data);
-			return (1);
-		}
-		if (data->philos[i].pid == 0)
-		{
-			philosopher_lifecycle(&(data->philos[i]));
-			exit(0);
-		}
-		i++;
-	}
-	wait_and_sem_close(data);
-	return (0);
-}
 static int	check_meals(t_philo *philo)
 {
 	if (!philo || !philo->data || !philo->data->meal_sem)
@@ -91,36 +33,43 @@ static int	check_meals(t_philo *philo)
 	return (0);
 }
 
+static long long	get_time_in_ms(struct timeval time)
+{
+	return ((time.tv_sec * 1000) + (time.tv_usec / 1000));
+}
+
+static int	handle_philosopher_death(t_philo *philo, long long current_time_ms)
+{
+	long long	timestamp;
+
+	sem_wait(philo->data->death_sem);
+	if (philo->data->d->__align != 1)
+	{
+		philo->data->d->__align = 1;
+		sem_post(philo->data->death_sem);
+		timestamp = current_time_ms - get_time_in_ms(philo->data->start_time);
+		sem_wait(philo->data->print_sem);
+		printf("%lld %d died\n", timestamp, philo->id);
+		sem_post(philo->data->print_sem);
+		return (1);
+	}
+	sem_post(philo->data->death_sem);
+	return (0);
+}
+
 static int	check_philosopher_death(t_philo *philo, struct timeval current_time)
 {
 	long long	last_meal_time_ms;
 	long long	current_time_ms;
-	long long	timestamp;
 
 	if (!philo || !philo->data || !philo->data->meal_sem)
 		return (0);
 	sem_wait(philo->data->meal_sem);
-	last_meal_time_ms = (philo->last_meal_time.tv_sec * 1000)
-		+ (philo->last_meal_time.tv_usec / 1000);
+	last_meal_time_ms = get_time_in_ms(philo->last_meal_time);
 	sem_post(philo->data->meal_sem);
-	current_time_ms = (current_time.tv_sec * 1000) + (current_time.tv_usec
-			/ 1000);
+	current_time_ms = get_time_in_ms(current_time);
 	if ((current_time_ms - last_meal_time_ms) >= philo->data->time_to_die)
-	{
-		sem_wait(philo->data->death_sem);
-		if (philo->data->d->__align != 1)
-		{
-			philo->data->d->__align = 1;
-			sem_post(philo->data->death_sem);
-			timestamp = current_time_ms - ((philo->data->start_time.tv_sec
-						* 1000) + (philo->data->start_time.tv_usec / 1000));
-			sem_wait(philo->data->print_sem);
-			printf("%lld %d died\n", timestamp, philo->id);
-			sem_post(philo->data->print_sem);
-			return (1);
-		}
-		sem_post(philo->data->death_sem);
-	}
+		return (handle_philosopher_death(philo, current_time_ms));
 	return (0);
 }
 

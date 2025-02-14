@@ -6,7 +6,7 @@
 /*   By: sodahani <sodahani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:34:41 by sodahani          #+#    #+#             */
-/*   Updated: 2025/02/14 18:03:09 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/14 18:32:22 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,29 @@ void	release_forks(t_philo *philo)
 	sem_post(philo->data->forks);
 	sem_post(philo->data->forks);
 }
+
+void	philosopher_eat(t_philo *philo)
+{
+	t_data	*data;
+
+	data = philo->data;
+	print_status(philo, "is eating");
+	sem_wait(data->meal_sem);
+	philo->last_meal_time = get_current_time();
+	philo->meals_eaten++;
+	sem_post(data->meal_sem);
+	usleep(data->time_to_eat * 1000);
+	if (philo->meals_eaten >= data->must_eat_count
+		&& !philo->has_finished_meals)
+	{
+		philo->has_finished_meals = true;
+		sem_wait(data->meal_sem);
+		data->m->__align++;
+		sem_post(data->meal_sem);
+	}
+	release_forks(philo);
+}
+
 void	philosopher_lifecycle(t_philo *philo)
 {
 	t_data		*data;
@@ -32,9 +55,7 @@ void	philosopher_lifecycle(t_philo *philo)
 
 	data = philo->data;
 	if (pthread_create(&monitor_thread, NULL, monitor_death, philo) != 0)
-	{
 		write(2, "Error: Failed to create monitor thread\n", 40);
-	}
 	pthread_detach(monitor_thread);
 	while (1)
 	{
@@ -43,21 +64,7 @@ void	philosopher_lifecycle(t_philo *philo)
 		print_status(philo, "is thinking");
 		pick_forks(philo);
 		print_status(philo, "has taken a fork");
-		sem_wait(data->meal_sem);
-		philo->last_meal_time = get_current_time();
-		sem_post(data->meal_sem);
-		print_status(philo, "is eating");
-		usleep(data->time_to_eat * 1000);
-		philo->meals_eaten++;
-		if (philo->meals_eaten >= data->must_eat_count
-			&& !philo->has_finished_meals)
-		{
-			philo->has_finished_meals = true;
-			sem_wait(data->meal_sem);
-			data->m->__align++;
-			sem_post(data->meal_sem);
-		}
-		release_forks(philo);
+		philosopher_eat(philo);
 		if (check_if_dead(philo))
 			break ;
 		print_status(philo, "is sleeping");
@@ -66,37 +73,6 @@ void	philosopher_lifecycle(t_philo *philo)
 	}
 	cleanup_all(philo->data);
 	exit(0);
-}
-
-void	print_status(t_philo *philo, const char *status)
-{
-	struct timeval	current_time;
-	long long		timestamp;
-
-	sem_wait(philo->data->death_sem);
-	if (philo->data->d->__align == 1)
-	{
-		sem_post(philo->data->death_sem);
-		return ;
-	}
-	sem_post(philo->data->death_sem);
-	gettimeofday(&current_time, NULL);
-	timestamp = ((current_time.tv_sec * 1000) + (current_time.tv_usec / 1000))
-		- ((philo->data->start_time.tv_sec * 1000)
-			+ (philo->data->start_time.tv_usec / 1000));
-	sem_wait(philo->data->print_sem);
-	printf("%lld  %d %s\n", timestamp, philo->id, status);
-	sem_post(philo->data->print_sem);
-}
-
-int	check_if_dead(t_philo *philo)
-{
-	int	is_dead;
-
-	sem_wait(philo->data->death_sem);
-	is_dead = philo->data->d->__align;
-	sem_post(philo->data->death_sem);
-	return (is_dead);
 }
 
 void	cleanup_sems(t_data *data)
