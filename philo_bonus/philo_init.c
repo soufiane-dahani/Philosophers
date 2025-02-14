@@ -6,7 +6,7 @@
 /*   By: sodahani <sodahani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:34:41 by sodahani          #+#    #+#             */
-/*   Updated: 2025/02/13 15:30:12 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/14 10:05:32 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,8 +29,6 @@ static int	init_global_sems(t_data *data)
 	sem_unlink("/print");
 	sem_unlink("/meal_check");
 	sem_unlink("/death_sem");
-	sem_unlink("/last_meal");
-	sem_unlink("/meal_count");
 	sem_unlink("/d");
 	sem_unlink("/m");
 	data->d = sem_open("/d", O_CREAT | O_EXCL, 0644, 1);

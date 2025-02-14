@@ -6,7 +6,7 @@
 /*   By: sodahani <sodahani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:34:41 by sodahani          #+#    #+#             */
-/*   Updated: 2025/02/13 23:48:39 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/14 10:05:36 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,10 +100,12 @@ void	cleanup_sems(t_data *data)
 	sem_close(data->print_sem);
 	sem_close(data->meal_sem);
 	sem_close(data->death_sem);
+	sem_close(data->d);
+	sem_close(data->m);
+	sem_unlink("/m");
+	sem_unlink("/d");
 	sem_unlink("/forks");
 	sem_unlink("/print");
 	sem_unlink("/meal_check");
 	sem_unlink("/death_sem");
-	sem_unlink("/last_meal");
-	sem_unlink("/meal_count");
 }

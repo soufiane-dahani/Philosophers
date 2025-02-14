@@ -6,7 +6,7 @@
 /*   By: sodahani <sodahani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:35:01 by sodahani          #+#    #+#             */
-/*   Updated: 2025/02/13 15:29:45 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/14 10:11:25 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,5 +92,8 @@ int						check_if_dead(t_philo *philo);
 void					*monitor_death(void *arg);
 
 void					terminate_processes(t_data *data);
+
+
+void	cleanup_all(t_data *data);
 
 #endif
