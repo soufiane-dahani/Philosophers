@@ -6,7 +6,7 @@
 /*   By: sodahani <sodahani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:34:41 by sodahani          #+#    #+#             */
-/*   Updated: 2025/02/14 16:21:35 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/14 17:57:14 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,11 +66,6 @@ void philosopher_lifecycle(t_philo *philo)
         usleep(data->time_to_sleep * 1000);
         usleep(500);
     }
-
-    // ✅ Ensure thread exits before cleanup
-    // if (pthread_join(monitor_thread, NULL) != 0)
-    //     write(2, "Error: pthread_join failed\n", 27);
-    
     cleanup_all(philo->data);
     exit(0);
 }
@@ -89,7 +84,7 @@ void print_status(t_philo *philo, const char *status)
             + (philo->data->start_time.tv_usec / 1000));
 
     sem_wait(philo->data->print_sem);
-    printf("%lld ms Philosopher %d %s\n", timestamp, philo->id, status);
+    printf("%lld  %d %s\n", timestamp, philo->id, status);
     sem_post(philo->data->print_sem);
 }
 

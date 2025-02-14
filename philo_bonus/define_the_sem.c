@@ -6,7 +6,7 @@
 /*   By: sodahani <sodahani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:34:41 by sodahani          #+#    #+#             */
-/*   Updated: 2025/02/14 16:19:51 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/14 17:54:52 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,8 +41,6 @@ static void wait_and_sem_close(t_data *data)
         if (WIFEXITED(status) || WIFSIGNALED(status))
             continue;
     }
-
-    // Ensure all remaining zombie processes are cleaned up
     while (wait(NULL) > 0);
 
     terminate_processes(data);
@@ -87,7 +85,6 @@ static int	check_meals(t_philo *philo)
 		}
 		sem_post(philo->data->print_sem);
 		sem_post(philo->data->meal_sem);
-		terminate_processes(philo->data);
 		return (1);
 	}
 	sem_post(philo->data->meal_sem);
@@ -107,12 +104,10 @@ static int check_philosopher_death(t_philo *philo, struct timeval current_time)
     sem_post(philo->data->meal_sem);
     
     current_time_ms = (current_time.tv_sec * 1000) + (current_time.tv_usec / 1000);
-    
-    // *** FIX: Allow a little extra time for checking ***
     if ((current_time_ms - last_meal_time_ms) >= philo->data->time_to_die)
     {
         sem_wait(philo->data->death_sem);
-        if (philo->data->d->__align != 1) // Ensures only one death message
+        if (philo->data->d->__align != 1)
         {
             philo->data->d->__align = 1;
             sem_post(philo->data->death_sem);
@@ -123,7 +118,6 @@ static int check_philosopher_death(t_philo *philo, struct timeval current_time)
             sem_wait(philo->data->print_sem);
             printf("%lld %d died\n", timestamp, philo->id);
             sem_post(philo->data->print_sem);
-            terminate_processes(philo->data);
             return (1);
         }
         sem_post(philo->data->death_sem);
@@ -144,19 +138,18 @@ void *monitor_death(void *arg)
         gettimeofday(&current_time, NULL);
         if (check_philosopher_death(philo, current_time)) break;
 
-        // ✅ Ensure the thread exits when simulation ends
         sem_wait(philo->data->death_sem);
         if (philo->data->d->__align == 1)
         {
             sem_post(philo->data->death_sem);
-            break;  // ✅ Exit loop cleanly
+            break;
         }
         sem_post(philo->data->death_sem);
 
         usleep(1000);
     }
 
-    return NULL;  // ✅ Thread exits naturally
+    return NULL;
 }
 
 
