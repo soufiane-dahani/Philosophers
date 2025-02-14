@@ -6,7 +6,7 @@
 /*   By: sodahani <sodahani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:34:41 by sodahani          #+#    #+#             */
-/*   Updated: 2025/02/14 18:43:05 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/14 19:13:06 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,11 +20,13 @@ static int	check_meals(t_philo *philo)
 	if (philo->data->m->__align == philo->data->num_philos)
 	{
 		sem_wait(philo->data->print_sem);
+        sem_wait(philo->data->death_sem);
 		if (philo->data->d->__align != 1)
 		{
 			philo->data->d->__align = 1;
 			printf("all philosophers have finished their meals\n");
 		}
+        sem_post(philo->data->death_sem);
 		sem_post(philo->data->print_sem);
 		sem_post(philo->data->meal_sem);
 		return (1);
