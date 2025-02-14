@@ -74,35 +74,32 @@ static int	init_sem_and_philos(t_data *data)
 	return (0);
 }
 
-t_data *initialize_data(t_init init)
+t_data	*initialize_data(t_init init)
 {
-    t_data *data;
+	t_data	*data;
 
-    data = malloc(sizeof(t_data));
-    if (!data)
-        return (NULL);
-    memset(data, 0, sizeof(t_data));  // ✅ Initialize entire structure to zero
-
-    data->num_philos = init.num_philos;
-    data->time_to_die = init.time_to_die;
-    data->time_to_eat = init.time_to_eat;
-    data->time_to_sleep = init.time_to_sleep;
-    data->must_eat_count = init.must_eat_count;
-    data->is_dead = 0;
-    data->philos = malloc(sizeof(t_philo) * init.num_philos);
-    if (!data->philos)
-        return (free(data), NULL);
-    
-    memset(data->philos, 0, sizeof(t_philo) * init.num_philos); // ✅ Initialize all philosophers
-
-    if (init_sem_and_philos(data))
-    {
-        cleanup_sems(data);
-        free(data->philos);
-        free(data);
-        return (NULL);
-    }
-    gettimeofday(&data->start_time, NULL);
-    return (data);
+	data = malloc(sizeof(t_data));
+	if (!data)
+		return (NULL);
+	memset(data, 0, sizeof(t_data)); // ✅ Initialize entire structure to zero
+	data->num_philos = init.num_philos;
+	data->time_to_die = init.time_to_die;
+	data->time_to_eat = init.time_to_eat;
+	data->time_to_sleep = init.time_to_sleep;
+	data->must_eat_count = init.must_eat_count;
+	data->is_dead = 0;
+	data->philos = malloc(sizeof(t_philo) * init.num_philos);
+	if (!data->philos)
+		return (free(data), NULL);
+	memset(data->philos, 0, sizeof(t_philo) * init.num_philos);
+	// ✅ Initialize all philosophers
+	if (init_sem_and_philos(data))
+	{
+		cleanup_sems(data);
+		free(data->philos);
+		free(data);
+		return (NULL);
+	}
+	gettimeofday(&data->start_time, NULL);
+	return (data);
 }
-
