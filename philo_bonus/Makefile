@@ -1,5 +1,5 @@
-SRCS = ft_split.c ft_strdup.c ft_strjoin.c philo.c helper_function.c philo_init.c \
-		define_the_sem.c Simulate.c Simulate2.c Simulate3.c 
+SRCS = ft_split_bonus.c ft_strdup_bonus.c ft_strjoin_bonus.c philo_bonus.c helper_function_bonus.c philo_init_bonus.c \
+		define_the_sem_bonus.c Simulate_bonus.c Simulate2_bonus.c Simulate3_bonus.c 
 OBJS = ${SRCS:.c=.o}
 NAME = philo_bonus
 CC = cc
