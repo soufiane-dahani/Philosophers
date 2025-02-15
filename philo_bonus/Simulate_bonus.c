@@ -6,7 +6,7 @@
 /*   By: sodahani <sodahani@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 16:34:41 by sodahani          #+#    #+#             */
-/*   Updated: 2025/02/15 10:21:12 by sodahani         ###   ########.fr       */
+/*   Updated: 2025/02/15 12:29:54 by sodahani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,6 @@ void	philosopher_lifecycle(t_philo *philo)
 	data = philo->data;
 	if (pthread_create(&monitor_thread, NULL, monitor_death, philo) != 0)
 		write(2, "Error: Failed to create monitor thread\n", 40);
-	pthread_detach(monitor_thread);
 	while (1)
 	{
 		if (check_if_dead(philo))
@@ -71,6 +70,7 @@ void	philosopher_lifecycle(t_philo *philo)
 		usleep(data->time_to_sleep * 1000);
 		usleep(500);
 	}
+	pthread_join(monitor_thread, NULL);
 	cleanup_all(philo->data);
 	exit(0);
 }
